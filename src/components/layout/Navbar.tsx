@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, ArrowRight, ShieldCheck, Lock } from "lucide-react";
+import { Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
 import { SCHOOL_INFO } from "@/config/schoolInfo";
 
 const NAV_LINKS = [
@@ -51,22 +51,13 @@ export function Navbar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center text-xs">
             <a
               href={`tel:${SCHOOL_INFO.contact.phoneOffice}`}
               className="hover:text-[#D4AF37] transition-colors"
             >
               Office: {SCHOOL_INFO.contact.phoneOffice}
             </a>
-            <span className="text-slate-600">|</span>
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center gap-1 text-slate-400 hover:text-[#D4AF37] transition-colors"
-              title="Authorized Staff Portal"
-            >
-              <Lock className="w-3 h-3 text-[#D4AF37]/80" />
-              <span>Admin Portal</span>
-            </Link>
           </div>
         </div>
       </div>
@@ -163,14 +154,6 @@ export function Navbar() {
                   <span>Admission Enquiry 2025–26</span>
                   <ArrowRight className="w-4 h-4" />
                 </a>
-                <Link
-                  href="/admin/login"
-                  onClick={closeMenu}
-                  className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-white/5"
-                >
-                  <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
-                  <span>Authorized Staff Portal</span>
-                </Link>
               </div>
             </div>
           </div>

@@ -1,6 +1,5 @@
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   MapPin,
   Phone,
@@ -8,7 +7,6 @@ import {
   Clock,
   ShieldCheck,
   ExternalLink,
-  Lock,
 } from "lucide-react";
 import { SCHOOL_INFO, getWhatsAppEnquiryUrl } from "@/config/schoolInfo";
 
@@ -226,14 +224,6 @@ export function Footer() {
             <span className="text-slate-500 text-[11px]">
               CBSE Affiliation No: 130072
             </span>
-            <span className="text-slate-700">•</span>
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center gap-1 text-slate-400 hover:text-[#D4AF37] transition-colors"
-            >
-              <Lock className="w-3 h-3 text-[#D4AF37]" />
-              <span>Admin Login</span>
-            </Link>
           </div>
         </div>
       </div>
