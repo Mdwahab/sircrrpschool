@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, ArrowRight, ShieldCheck } from "lucide-react";
-import { SCHOOL_INFO } from "@/config/schoolInfo";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "#about", label: "About" },
@@ -32,38 +31,7 @@ export function Navbar() {
   const closeMenu = () => setMobileMenuOpen(false);
 
   return (
-    <>
-      {/* Top Notification / Affiliation Bar */}
-      <div className="bg-[#040C18] border-b border-[#D4AF37]/20 text-slate-300 text-xs py-1.5 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-[#D4AF37] font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
-              CBSE Affiliated Senior Secondary School
-            </span>
-            <span className="hidden sm:inline text-slate-500">•</span>
-            <span className="hidden sm:inline text-slate-400">
-              Affiliation No. <strong className="text-white">130072</strong>
-            </span>
-            <span className="hidden md:inline text-slate-500">•</span>
-            <span className="hidden md:inline text-slate-400">
-              Estd. 1984, Eluru, A.P.
-            </span>
-          </div>
-
-          <div className="flex items-center text-xs">
-            <a
-              href={`tel:${SCHOOL_INFO.contact.phoneOffice}`}
-              className="hover:text-[#D4AF37] transition-colors"
-            >
-              Office: {SCHOOL_INFO.contact.phoneOffice}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Sticky Navbar */}
-      <header
+    <header
         className={`sticky top-0 z-50 transition-all duration-300 ${
           isScrolled
             ? "bg-[#07172F]/95 backdrop-blur-md shadow-xl border-b border-[#D4AF37]/25 py-2.5"
@@ -159,6 +127,5 @@ export function Navbar() {
           </div>
         )}
       </header>
-    </>
   );
 }
