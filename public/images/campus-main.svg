@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0B1A30" />
+      <stop offset="60%" stop-color="#142C52" />
+      <stop offset="100%" stop-color="#1E3E73" />
+    </linearGradient>
+    <linearGradient id="groundGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0E2342" />
+      <stop offset="100%" stop-color="#061224" />
+    </linearGradient>
+    <linearGradient id="goldAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#AA7C11" />
+    </linearGradient>
+    <pattern id="archGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#224275" stroke-width="0.7" opacity="0.3" />
+    </pattern>
+  </defs>
+
+  <!-- Background Sky -->
+  <rect width="1200" height="800" fill="url(#skyGrad)" />
+  <rect width="1200" height="800" fill="url(#archGrid)" />
+
+  <!-- Architectural Silhouette of Campus -->
+  <g transform="translate(150, 240)">
+    <!-- Main Block -->
+    <rect x="100" y="80" width="700" height="320" rx="4" fill="#0C203E" stroke="#2D4D7F" stroke-width="2" />
+    
+    <!-- Central Portico & Classical Pediment -->
+    <polygon points="450, -10 320, 80 580, 80" fill="#102A52" stroke="#D4AF37" stroke-width="2" />
+    <rect x="330" y="80" width="240" height="320" fill="#0E2548" stroke="#375D99" stroke-width="2" />
+    
+    <!-- Pillars -->
+    <rect x="355" y="110" width="18" height="290" fill="#D4AF37" opacity="0.8" />
+    <rect x="415" y="110" width="18" height="290" fill="#D4AF37" opacity="0.8" />
+    <rect x="475" y="110" width="18" height="290" fill="#D4AF37" opacity="0.8" />
+    <rect x="535" y="110" width="18" height="290" fill="#D4AF37" opacity="0.8" />
+
+    <!-- Clock / Crest in Pediment -->
+    <circle cx="450" cy="45" r="22" fill="#0A182F" stroke="#D4AF37" stroke-width="2" />
+    <circle cx="450" cy="45" r="16" fill="none" stroke="#D4AF37" stroke-width="1" stroke-dasharray="2 2" />
+
+    <!-- Window Rows - Left Wing -->
+    <g fill="#183866" stroke="#294E85" stroke-width="1.5">
+      <rect x="130" y="110" width="40" height="55" rx="3" />
+      <rect x="190" y="110" width="40" height="55" rx="3" />
+      <rect x="250" y="110" width="40" height="55" rx="3" />
+      
+      <rect x="130" y="190" width="40" height="55" rx="3" />
+      <rect x="190" y="190" width="40" height="55" rx="3" />
+      <rect x="250" y="190" width="40" height="55" rx="3" />
+
+      <rect x="130" y="270" width="40" height="55" rx="3" />
+      <rect x="190" y="270" width="40" height="55" rx="3" />
+      <rect x="250" y="270" width="40" height="55" rx="3" />
+    </g>
+
+    <!-- Window Rows - Right Wing -->
+    <g fill="#183866" stroke="#294E85" stroke-width="1.5">
+      <rect x="610" y="110" width="40" height="55" rx="3" />
+      <rect x="670" y="110" width="40" height="55" rx="3" />
+      <rect x="730" y="110" width="40" height="55" rx="3" />
+      
+      <rect x="610" y="190" width="40" height="55" rx="3" />
+      <rect x="670" y="190" width="40" height="55" rx="3" />
+      <rect x="730" y="190" width="40" height="55" rx="3" />
+
+      <rect x="610" y="270" width="40" height="55" rx="3" />
+      <rect x="670" y="270" width="40" height="55" rx="3" />
+      <rect x="730" y="270" width="40" height="55" rx="3" />
+    </g>
+
+    <!-- Flagmast -->
+    <line x1="450" y1="-10" x2="450" y2="-70" stroke="#E2E8F0" stroke-width="3" />
+    <polygon points="453,-68 495,-55 453,-42" fill="#FF9933" />
+  </g>
+
+  <!-- Foreground Courtyard Ground -->
+  <rect y="640" width="1200" height="160" fill="url(#groundGrad)" stroke="#D4AF37" stroke-width="1" />
+
+  <!-- Verification Badge Overlay -->
+  <g transform="translate(600, 680)">
+    <rect x="-380" y="-35" width="760" height="70" rx="8" fill="#051020" fill-opacity="0.92" stroke="#D4AF37" stroke-width="1.5" />
+    <circle cx="-335" cy="0" r="14" fill="#D4AF37" />
+    <text x="-335" y="4" font-family="Arial, sans-serif" font-size="13" font-weight="bold" fill="#081830" text-anchor="middle">i</text>
+    <text x="-305" y="-5" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#FFFFFF">
+      CAMPUS MAIN INFRASTRUCTURE
+    </text>
+    <text x="-305" y="17" font-family="Arial, sans-serif" font-size="12" fill="#94A3B8">
+      [DEVELOPMENT ASSET - PENDING OFFICIAL CAMPUS PHOTOGRAPH REPLACEMENT]
+    </text>
+  </g>
+</svg>
