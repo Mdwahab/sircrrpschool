@@ -43,13 +43,13 @@ export function AdminSidebar() {
       <div>
         {/* Header / Brand */}
         <div className="p-5 border-b border-[#C8D9E6] flex items-center gap-3 bg-[#F5EEEB]">
-          <div className="relative w-12 h-12 flex-shrink-0 bg-white rounded-full border-2 border-[#C8D9E6] shadow-xs overflow-hidden">
+          <div className="relative w-12 h-12 flex-shrink-0 bg-white rounded-full border-2 border-[#C8D9E6] shadow-xs overflow-hidden flex items-center justify-center">
             <Image
               src="/images/schoollogo.png"
               alt="Sir C. R. Reddy Crest"
-              fill
-              sizes="48px"
-              className="object-cover"
+              width={48}
+              height={48}
+              className="object-cover w-full h-full"
             />
           </div>
           <div>

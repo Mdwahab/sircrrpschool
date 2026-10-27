@@ -32,13 +32,13 @@ export function Footer({ settings }: FooterProps = {}) {
           {/* Col 1: Identity (4 cols) */}
           <div className="lg:col-span-4 space-y-2.5">
             <div className="flex items-center gap-3">
-              <div className="relative w-10 h-10 flex-shrink-0 bg-white rounded-full border border-[#C8D9E6] shadow-xs overflow-hidden">
+              <div className="relative w-10 h-10 flex-shrink-0 bg-white rounded-full border border-[#C8D9E6] shadow-xs overflow-hidden flex items-center justify-center">
                 <Image
                   src="/images/schoollogo.png"
                   alt="Sir C. R. Reddy Public School Crest"
-                  fill
-                  sizes="40px"
-                  className="object-cover"
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
                 />
               </div>
               <div className="leading-tight">

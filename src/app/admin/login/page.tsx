@@ -64,14 +64,14 @@ export default function AdminLoginPage() {
       >
         {/* Crest & Title */}
         <div className="text-center mb-8">
-          <div className="relative w-16 h-16 mx-auto mb-3 rounded-full border-2 border-[#C8D9E6] shadow-sm overflow-hidden bg-white">
+          <div className="relative w-16 h-16 mx-auto mb-3 rounded-full border-2 border-[#C8D9E6] shadow-sm overflow-hidden bg-white flex items-center justify-center">
             <Image
               src="/images/schoollogo.png"
               alt="Sir C. R. Reddy School Crest"
-              fill
-              sizes="64px"
+              width={64}
+              height={64}
               priority
-              className="object-cover"
+              className="object-cover w-full h-full"
             />
           </div>
           <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#2F4156]">
