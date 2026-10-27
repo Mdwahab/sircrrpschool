@@ -252,7 +252,7 @@ export function AcademicsSection() {
               return (
                 <ScrollStaggerItem key={idx} className={isSpotlight ? "lg:col-span-2" : "lg:col-span-1"}>
                   <div className="bg-white rounded-3xl overflow-hidden border border-[#C8D9E6] hover:border-[#567C8D] transition-all duration-300 flex flex-col group shadow-xs hover:shadow-xl hover:-translate-y-1.5 h-full">
-                    <div className={`relative bg-[#F5EEEB] overflow-hidden ${isSpotlight ? "aspect-[16/10] lg:aspect-[20/10]" : "aspect-[16/10]"}`}>
+                    <div style={{ position: "relative" }} className={`relative bg-[#F5EEEB] overflow-hidden ${isSpotlight ? "aspect-[16/10] lg:aspect-[20/10]" : "aspect-[16/10]"}`}>
                       <Image
                         src={fac.image}
                         alt={fac.title}

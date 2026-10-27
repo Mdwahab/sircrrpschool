@@ -104,7 +104,7 @@ export function AboutSection() {
           {/* Founder Portrait Column: Film-like Mask Expansion Reveal */}
           <CinematicMaskReveal className="lg:col-span-5 flex justify-center" delay={0.1}>
             <div className="relative w-full max-w-sm rounded-2xl overflow-hidden bg-white p-4 shadow-md border-2 border-[#C8D9E6] group transition-all duration-300 hover:shadow-xl hover:border-[#567C8D] hover:-translate-y-1">
-              <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F5EEEB] border border-[#C8D9E6]/60">
+              <div style={{ position: "relative" }} className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F5EEEB] border border-[#C8D9E6]/60">
                 <Image
                   src="/images/founder-portrait.svg"
                   alt="Dr. Sir Cattamanchi Ramalinga Reddy Tribute Portrait"

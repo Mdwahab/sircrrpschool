@@ -112,7 +112,7 @@ export function GallerySection({ initialImages }: GallerySectionProps) {
                     onClick={() => handleOpenLightbox(idx)}
                     className="bg-white rounded-3xl overflow-hidden border border-[#C8D9E6] hover:border-[#567C8D] transition-all duration-300 group cursor-pointer flex flex-col shadow-xs hover:shadow-xl hover:-translate-y-1.5 h-full"
                   >
-                    <div className="relative aspect-[16/10] bg-[#F5EEEB] overflow-hidden">
+                    <div style={{ position: "relative" }} className="relative aspect-[16/10] bg-[#F5EEEB] overflow-hidden">
                       <Image
                         src={image.image_url}
                         alt={image.alt_text}

@@ -150,7 +150,7 @@ export function HeroSection({ settings }: HeroSectionProps = {}) {
           >
             <CinematicParallaxContainer parallaxOffset={20} className="w-full max-w-lg rounded-3xl">
               {/* Main Campus Image Showcase in Natural Photo Colors */}
-              <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-2 border-[#C8D9E6] bg-white group transition-all duration-300 hover:shadow-2xl hover:border-[#567C8D]">
+              <div style={{ position: "relative" }} className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border-2 border-[#C8D9E6] bg-white group transition-all duration-300 hover:shadow-2xl hover:border-[#567C8D]">
                 <Image
                   src="/images/school/campus/campus-aerial-panorama.jpg"
                   alt="Sir C. R. Reddy Public School Main Campus Panoramic View"

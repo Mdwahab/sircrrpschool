@@ -36,7 +36,7 @@ export function PrincipalSection({ settings }: PrincipalSectionProps = {}) {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Principal Insignia / Portrait Column */}
             <ScrollImageReveal className="md:col-span-5 flex flex-col items-center text-center" delay={0.1}>
-              <div className="relative w-full max-w-[260px] aspect-[4/5] rounded-2xl overflow-hidden bg-[#F5EEEB] border-2 border-[#C8D9E6] shadow-sm group transition-all duration-300 hover:shadow-lg hover:border-[#567C8D] hover:-translate-y-1">
+              <div style={{ position: "relative" }} className="relative w-full max-w-[260px] aspect-[4/5] rounded-2xl overflow-hidden bg-[#F5EEEB] border-2 border-[#C8D9E6] shadow-sm group transition-all duration-300 hover:shadow-lg hover:border-[#567C8D] hover:-translate-y-1">
                 <Image
                   src="/images/principal-placeholder.svg"
                   alt="Office of the Principal Insignia - Sir C. R. Reddy Public School"
