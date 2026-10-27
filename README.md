@@ -28,7 +28,7 @@ This codebase delivers:
 | :--- | :--- | :--- |
 | **Framework** | Next.js 16 (App Router) | Server components by default, Turbopack, static prerendering, streaming |
 | **Language** | TypeScript (Strict) | End-to-end typed interfaces for database entities and API payloads |
-| **Styling** | Tailwind CSS v4 & Vanilla CSS | Curated Oxford Navy (`#07172F`), Royal Gold (`#D4AF37`), glassmorphism |
+| **Styling** | Tailwind CSS v4 & Vanilla CSS | Curated White-First (`#FFFFFF`), Deep Navy (`#102A43`), Royal Blue (`#2563EB`) |
 | **Icons & Typography** | Lucide React & Plus Jakarta Sans | Accessible SVG iconography and editorial typography |
 | **Database & Auth** | Supabase (PostgreSQL + Auth + Storage) | Row-Level Security (RLS), UUIDs, storage buckets with MIME validation |
 | **Notifications** | Resend | HTML email notifications to the school admissions desk |

@@ -1,82 +1,151 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Trophy,
   Plus,
   Trash2,
   CheckCircle,
   XCircle,
-  Calendar,
+  Award,
+  FileText,
   Loader2,
   AlertCircle,
-  Award,
+  RefreshCw,
+  Edit2,
 } from "lucide-react";
 import { Achievement } from "@/lib/db/types";
+import { AdminFileUpload } from "@/components/ui/AdminFileUpload";
+
+const CATEGORIES: Achievement["category"][] = [
+  "CBSE Board Examination",
+  "Olympiad & Academics",
+  "Sports & Athletics",
+  "Co-Curricular",
+];
 
 export default function AdminResultsPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Achievement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
 
   // Form state
   const [form, setForm] = useState({
     title: "",
-    academic_year: "2024–2025",
     category: "CBSE Board Examination" as Achievement["category"],
-    description: "",
+    academic_year: "2025–2026",
     student_name: "",
+    description: "",
     document_url: "",
     is_published: true,
-    is_verified_record: true,
   });
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const res = await fetch("/api/admin/results", { signal: controller.signal });
+      clearTimeout(timeout);
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `HTTP ${res.status}: Failed to load results`);
+      }
+
+      setAchievements(Array.isArray(data.achievements) ? data.achievements : []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load achievements.";
+      setErrorMsg(message);
+    } finally {
+      clearTimeout(timeout);
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let ignore = false;
-    async function loadData() {
+    const fetchAchievements = async () => {
       try {
         const res = await fetch("/api/admin/results");
         const data = await res.json();
         if (!ignore && data.success) {
-          setAchievements(data.achievements);
+          setAchievements(Array.isArray(data.achievements) ? data.achievements : []);
         }
-      } catch {
-        if (!ignore) setErrorMsg("Failed to load achievements.");
+      } catch (err: unknown) {
+        if (!ignore) {
+          const message = err instanceof Error ? err.message : "Failed to load achievements.";
+          setErrorMsg(message);
+        }
       } finally {
         if (!ignore) setLoading(false);
       }
-    }
-    loadData();
+    };
+    fetchAchievements();
     return () => {
       ignore = true;
     };
   }, []);
 
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setForm({
+      title: "",
+      category: "CBSE Board Examination",
+      academic_year: "2025–2026",
+      student_name: "",
+      description: "",
+      document_url: "",
+      is_published: true,
+    });
+    setModalOpen(true);
+  };
+
+  const handleOpenEdit = (item: Achievement) => {
+    setEditingItem(item);
+    setForm({
+      title: item.title,
+      category: item.category,
+      academic_year: item.academic_year,
+      student_name: item.student_name || "",
+      description: item.description,
+      document_url: item.document_url || "",
+      is_published: item.is_published,
+    });
+    setModalOpen(true);
+  };
+
   const handleTogglePublish = async (item: Achievement) => {
     try {
       const res = await fetch("/api/admin/results", {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...item,
-          is_published: !item.is_published,
-        }),
+        body: JSON.stringify({ id: item.id, is_published: !item.is_published }),
       });
       const data = await res.json();
       if (data.success) {
         setAchievements((prev) =>
-          prev.map((a) => (a.id === item.id ? data.achievement : a))
+          prev.map((a) =>
+            a.id === item.id ? { ...a, is_published: !a.is_published } : a
+          )
         );
+      } else {
+        alert(data.error || "Failed to update publication status.");
       }
     } catch {
-      alert("Failed to toggle publish status.");
+      alert("Failed to update status.");
     }
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Delete achievement record: "${title}"?`)) return;
+    if (!window.confirm(`Are you sure you want to delete achievement record: "${title}"?`)) return;
 
     try {
       const res = await fetch(`/api/admin/results?id=${id}`, {
@@ -85,28 +154,27 @@ export default function AdminResultsPage() {
       const data = await res.json();
       if (data.success) {
         setAchievements((prev) => prev.filter((a) => a.id !== id));
+      } else {
+        alert(data.error || "Failed to delete record.");
       }
     } catch {
-      alert("Failed to delete achievement.");
+      alert("Failed to delete record.");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim() || !form.academic_year.trim()) return;
+    if (!form.title.trim()) return;
 
     setSubmitting(true);
     setErrorMsg(null);
 
     try {
+      const payload = editingItem ? { ...form, id: editingItem.id } : form;
       const res = await fetch("/api/admin/results", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          student_name: form.student_name || null,
-          document_url: form.document_url || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -115,191 +183,261 @@ export default function AdminResultsPage() {
         return;
       }
 
-      setAchievements((prev) => [data.achievement, ...prev]);
+      if (editingItem) {
+        setAchievements((prev) =>
+          prev.map((a) => (a.id === editingItem.id ? data.achievement : a))
+        );
+      } else {
+        setAchievements((prev) => [data.achievement, ...prev]);
+      }
+
       setModalOpen(false);
-      setForm({
-        title: "",
-        academic_year: "2024–2025",
-        category: "CBSE Board Examination",
-        description: "",
-        student_name: "",
-        document_url: "",
-        is_published: true,
-        is_verified_record: true,
-      });
+      setEditingItem(null);
     } catch {
-      setErrorMsg("Network error occurred.");
+      setErrorMsg("Network error during submission.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const filteredAchievements = achievements.filter((a) =>
+    activeCategory === "All" ? true : a.category === activeCategory
+  );
+
   return (
     <div className="space-y-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#C8D9E6] pb-5">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-white flex items-center gap-2.5">
-            <Trophy className="w-6 h-6 text-[#D4AF37]" />
-            <span>Board Examination Results &amp; Achievements</span>
+          <h1 className="text-2xl font-serif font-bold text-[#2F4156] flex items-center gap-2.5">
+            <Trophy className="w-6 h-6 text-[#567C8D]" />
+            <span>Board Examination Results &amp; Honors</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Maintain verified academic records, national olympiad honors, and athletic championships.
+          <p className="text-xs text-[#2F4156] mt-1 font-semibold">
+            Maintain certified Class X and XII pass records, merit distinctions, and accredited academic milestones.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#D4AF37] text-[#07172F] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Achievement</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-bold hover:bg-[#FFFFFF] hover:border-[#567C8D] transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            title="Refresh achievements"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-[#567C8D] ${loading ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer border border-[#2F4156]"
+          >
+            <Plus className="w-4 h-4 text-[#2F4156]" />
+            <span>Add Achievement</span>
+          </button>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="py-16 text-center text-slate-400 text-sm flex items-center justify-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-[#D4AF37]" />
-          <span>Loading achievements...</span>
-        </div>
-      ) : achievements.length === 0 ? (
-        <div className="glass-card rounded-xl p-10 text-center border border-slate-800 text-slate-400">
-          No achievement records cataloged yet.
-        </div>
-      ) : (
-        <div className="glass-card rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-[#040C18] text-[#D4AF37] uppercase tracking-wider text-[11px] border-b border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-4 font-bold">Category &amp; Year</th>
-                  <th className="py-3.5 px-4 font-bold">Achievement Record</th>
-                  <th className="py-3.5 px-4 font-bold">Status</th>
-                  <th className="py-3.5 px-4 font-bold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {achievements.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#0E2548] text-[#D4AF37] border border-[#D4AF37]/30 block w-max mb-1">
-                        {item.category}
-                      </span>
-                      <span className="flex items-center gap-1 text-slate-400 text-xs">
-                        <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{item.academic_year}</span>
-                      </span>
-                    </td>
+      {/* Category Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2">
+        {["All", ...CATEGORIES].map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setActiveCategory(cat)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeCategory === cat
+                ? "bg-[#567C8D] text-[#2F4156] shadow-xs"
+                : "bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border-2 border-[#C8D9E6]"
+            }`}
+          >
+            {cat} {cat === "All" ? `(${achievements.length})` : `(${achievements.filter((a) => a.category === cat).length})`}
+          </button>
+        ))}
+      </div>
 
-                    <td className="py-4 px-4 align-top max-w-md">
-                      <strong className="text-white block font-semibold text-sm mb-1">
-                        {item.title}
-                      </strong>
-                      <p className="text-slate-400 text-xs line-clamp-2">
-                        {item.description}
-                      </p>
-                      {item.student_name && (
-                        <div className="inline-flex items-center gap-1.5 text-amber-200/90 text-xs mt-1.5">
-                          <Award className="w-3 h-3 text-[#D4AF37]" />
-                          <span>Recipient: {item.student_name}</span>
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => handleTogglePublish(item)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                          item.is_published
-                            ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"
-                            : "bg-slate-800 text-slate-400 border border-slate-700"
-                        }`}
-                      >
-                        {item.is_published ? (
-                          <>
-                            <CheckCircle className="w-3 h-3 text-emerald-400" />
-                            <span>Published</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-3 h-3 text-slate-400" />
-                            <span>Draft</span>
-                          </>
-                        )}
-                      </button>
-                    </td>
-
-                    <td className="py-4 px-4 align-top text-right whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item.id, item.title)}
-                        className="p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-red-950/40 transition-colors cursor-pointer"
-                        title="Delete Record"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Actionable Error State with Retry */}
+      {errorMsg && !loading && (
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border-2 border-[#567C8D] text-[#2F4156] text-xs flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-[#567C8D] flex-shrink-0" />
+            <span className="font-bold">{errorMsg}</span>
           </div>
+          <button
+            type="button"
+            onClick={loadData}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] font-bold text-xs cursor-pointer transition-colors border border-[#2F4156]"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry</span>
+          </button>
         </div>
       )}
 
-      {/* Add Achievement Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-[#07172F] border border-[#D4AF37]/40 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative my-8">
-            <h3 className="text-xl font-serif font-bold text-white mb-1">
-              Add Verified School Achievement
-            </h3>
-            <p className="text-xs text-slate-400 mb-5">
-              Only verified board results and approved inter-school distinctions may be published.
-            </p>
+      {/* Loading State */}
+      {loading ? (
+        <div className="py-20 text-center text-[#2F4156] text-sm flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-[#567C8D]" />
+          <span className="font-semibold">Loading verified achievement registry...</span>
+        </div>
+      ) : filteredAchievements.length === 0 ? (
+        /* Empty State */
+        <div className="bg-[#FFFFFF] rounded-2xl p-12 text-center border-2 border-[#C8D9E6] space-y-3 shadow-xs">
+          <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border border-[#C8D9E6] mx-auto flex items-center justify-center text-[#567C8D]">
+            <Trophy className="w-6 h-6" />
+          </div>
+          <h3 className="text-[#2F4156] font-serif font-bold text-base">No achievements found</h3>
+          <p className="text-[#2F4156] text-xs max-w-md mx-auto">
+            {activeCategory === "All"
+              ? "No achievement records are currently registered. Click \"Add Achievement\" to record verified board or school honors."
+              : `No achievements recorded under "${activeCategory}".`}
+          </p>
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] text-xs font-bold uppercase tracking-wider cursor-pointer shadow-xs border border-[#2F4156]"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add First Record</span>
+          </button>
+        </div>
+      ) : (
+        /* Achievements Table/List */
+        <div className="space-y-4">
+          {filteredAchievements.map((item) => (
+            <div
+              key={item.id}
+              className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs min-w-0 overflow-hidden"
+            >
+              <div className="space-y-1.5 max-w-3xl min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#FFFFFF] text-[#567C8D] border border-[#C8D9E6]">
+                    Session {item.academic_year}
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]">
+                    {item.category}
+                  </span>
+                  {item.student_name && (
+                    <span className="text-xs text-[#2F4156] flex items-center gap-1 min-w-0 break-words [overflow-wrap:anywhere] font-bold">
+                      <Award className="w-3.5 h-3.5 text-[#567C8D] flex-shrink-0" />
+                      <span>{item.student_name}</span>
+                    </span>
+                  )}
+                </div>
 
-            {errorMsg && (
-              <div className="mb-4 p-3 rounded-lg bg-red-950/80 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
-                <span>{errorMsg}</span>
+                <h3 className="text-base font-bold text-[#2F4156] font-serif leading-snug break-words [overflow-wrap:anywhere]">
+                  {item.title}
+                </h3>
+                <p className="text-xs text-[#2F4156] leading-relaxed break-words [overflow-wrap:anywhere]">
+                  {item.description}
+                </p>
+
+                {item.document_url && (
+                  <div className="pt-1">
+                    <a
+                      href={item.document_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-[#2F4156] hover:text-[#567C8D] font-bold flex items-center gap-1"
+                    >
+                      <FileText className="w-3 h-3 text-[#567C8D]" />
+                      <span>View Attached Verification Document</span>
+                    </a>
+                  </div>
+                )}
               </div>
-            )}
+
+              <div className="flex items-center gap-2.5 self-end sm:self-center border-t sm:border-t-0 border-[#C8D9E6] pt-3 sm:pt-0 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleTogglePublish(item)}
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all ${
+                    item.is_published
+                      ? "bg-[#FFFFFF] text-[#2F4156] border-2 border-[#567C8D]"
+                      : "bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]"
+                  }`}
+                >
+                  {item.is_published ? (
+                    <>
+                      <CheckCircle className="w-3 h-3 text-[#567C8D]" />
+                      <span>Published</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3 h-3 text-[#2F4156]" />
+                      <span>Draft</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenEdit(item)}
+                  className="p-2 rounded-xl bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border border-[#C8D9E6] transition-colors cursor-pointer"
+                  title="Edit achievement"
+                >
+                  <Edit2 className="w-4 h-4 text-[#2F4156]" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDelete(item.id, item.title)}
+                  className="p-2 rounded-xl bg-[#FFFFFF] text-[#567C8D] hover:bg-[#567C8D] hover:text-[#2F4156] border border-[#C8D9E6] transition-colors cursor-pointer"
+                  title="Delete record"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Achievement Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2F4156]/70 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] border-2 border-[#C8D9E6] rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative my-8 animate-in fade-in zoom-in-95 duration-150">
+            <h3 className="text-xl font-serif font-bold text-[#2F4156] mb-1">
+              {editingItem ? "Edit Achievement Record" : "Add Board Result / Honor"}
+            </h3>
+            <p className="text-xs text-[#2F4156] mb-5">
+              Record verified school academic achievements and board examination distinction milestones.
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Achievement Title <span className="text-[#D4AF37]">*</span>
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Title / Milestone <span className="text-[#567C8D]">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="e.g. CBSE Class X Examination — 100% Pass Distinction"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37]"
+                  placeholder="e.g. CBSE Class X Board Examination — 100% Pass Record"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] focus:ring-2 focus:ring-[#567C8D]/20 outline-none font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                    Academic Year <span className="text-[#D4AF37]">*</span>
+                  <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                    Academic Session <span className="text-[#567C8D]">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={form.academic_year}
-                    onChange={(e) =>
-                      setForm({ ...form, academic_year: e.target.value })
-                    }
-                    placeholder="2024–2025"
-                    className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs"
+                    onChange={(e) => setForm({ ...form, academic_year: e.target.value })}
+                    placeholder="2025–2026"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-mono focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
                     Category
                   </label>
                   <select
@@ -310,77 +448,89 @@ export default function AdminResultsPage() {
                         category: e.target.value as Achievement["category"],
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-semibold"
                   >
-                    <option value="CBSE Board Examination">CBSE Board Examination</option>
-                    <option value="Olympiad & Academics">Olympiad &amp; Academics</option>
-                    <option value="Sports & Athletics">Sports &amp; Athletics</option>
-                    <option value="Co-Curricular">Co-Curricular</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Recipient Name / Batch Cohort
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Recipient / Batch / Student Name
                 </label>
                 <input
                   type="text"
                   value={form.student_name}
-                  onChange={(e) =>
-                    setForm({ ...form, student_name: e.target.value })
-                  }
-                  placeholder="e.g. Class X Board Candidates / Senior Athletic Squad"
-                  className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs"
+                  onChange={(e) => setForm({ ...form, student_name: e.target.value })}
+                  placeholder="e.g. Class X Secondary Examination Batch or Student Name"
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Full Description
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Description / Milestone Summary
                 </label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder="Verified details of the honor, distinction count, or examination marks overview..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-medium"
+                />
+              </div>
+
+              <div className="pt-2 border-t border-[#C8D9E6]">
+                <AdminFileUpload
+                  label="Document / Verification PDF (Optional)"
+                  helperText="Choose merit gazette, scorecard, or certificate from your file manager (Max 15 MB)"
+                  bucket="documents"
+                  value={form.document_url}
+                  onChange={(url) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      document_url: url,
+                    }))
                   }
-                  placeholder="Detailed description of distinction..."
-                  className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs"
                 />
               </div>
 
               <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-200">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-[#2F4156] font-semibold">
                   <input
                     type="checkbox"
                     checked={form.is_published}
                     onChange={(e) =>
                       setForm({ ...form, is_published: e.target.checked })
                     }
-                    className="rounded text-[#D4AF37]"
+                    className="rounded text-[#567C8D] focus:ring-[#567C8D]"
                   />
-                  <span>Publish Record Publicly</span>
+                  <span>Publish to Public Website Immediately</span>
                 </label>
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-800">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t-2 border-[#C8D9E6]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] text-[#2F4156] text-xs font-bold hover:bg-[#F5EEEB] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#D4AF37] text-[#07172F] text-xs font-bold uppercase tracking-wider hover:brightness-110 cursor-pointer disabled:opacity-50"
+                  disabled={submitting || !form.title.trim()}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#2F4156] hover:bg-[#1E2B3A] text-white text-xs font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-sm transition-all"
                 >
                   {submitting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                   ) : (
-                    <span>Save Achievement</span>
+                    <span>{editingItem ? "Update Record" : "Save Record"}</span>
                   )}
                 </button>
               </div>

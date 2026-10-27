@@ -40,3 +40,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local persistent database store
+/.data/
+
+# scratch and backup assets
+/scratch/
+/public/photos/
+/public/photos_backup/
+/public/images/backup/
+.agents/
+generate_school_contact_sheet.js
+organize_school_photos.js
+update_database_gallery_paths.js
+verify_all_school_images.js
+
+.vercel

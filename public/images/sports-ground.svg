@@ -11,18 +11,18 @@
   <!-- Running Track & Athletic Field Elements -->
   <g transform="translate(400, 230)">
     <!-- Track curve -->
-    <ellipse cx="0" cy="10" rx="120" ry="70" fill="none" stroke="#D4AF37" stroke-width="3" stroke-dasharray="10 6" />
-    <ellipse cx="0" cy="10" rx="90" ry="50" fill="none" stroke="#38BDF8" stroke-width="2" />
-    <!-- Football / Cricket ball & Trophy -->
-    <path d="M -35,-30 L -15,-60 L 15,-60 L 35,-30 L 25,0 L -25,0 Z" fill="#D4AF37" />
-    <path d="M -15,0 L -15,25 L -30,35 L 30,35 L 15,25 L 15,0 Z" fill="#AA7C11" />
+    <ellipse cx="0" cy="10" rx="120" ry="70" fill="none" stroke="#2563EB" stroke-width="3" stroke-dasharray="10 6" />
+    <ellipse cx="0" cy="10" rx="90" ry="50" fill="none" stroke="#60A5FA" stroke-width="2" />
+    <!-- Football / Cricket ball & Trophy in Royal Blue & Silver/Navy -->
+    <path d="M -35,-30 L -15,-60 L 15,-60 L 35,-30 L 25,0 L -25,0 Z" fill="#2563EB" />
+    <path d="M -15,0 L -15,25 L -30,35 L 30,35 L 15,25 L 15,0 Z" fill="#1D4ED8" />
     <circle cx="0" cy="-40" r="10" fill="#FFFFFF" />
-    <path d="M -45,-45 C -60,-35 -55,-10 -35,-15" fill="none" stroke="#D4AF37" stroke-width="4" stroke-linecap="round" />
-    <path d="M 45,-45 C 60,-35 55,-10 35,-15" fill="none" stroke="#D4AF37" stroke-width="4" stroke-linecap="round" />
+    <path d="M -45,-45 C -60,-35 -55,-10 -35,-15" fill="none" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" />
+    <path d="M 45,-45 C 60,-35 55,-10 35,-15" fill="none" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" />
   </g>
 
   <!-- Disclosure Label -->
-  <rect x="60" y="490" width="680" height="64" rx="8" fill="#051020" fill-opacity="0.95" stroke="#D4AF37" stroke-width="1.5" />
+  <rect x="60" y="490" width="680" height="64" rx="8" fill="#051020" fill-opacity="0.95" stroke="#2563EB" stroke-width="1.5" />
   <text x="400" y="518" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
     SPORTS GROUNDS, ATHLETICS &amp; PHYSICAL EDUCATION
   </text>

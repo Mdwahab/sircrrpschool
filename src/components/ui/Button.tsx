@@ -18,23 +18,23 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-center";
+    "inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-center select-none";
 
   const sizeStyles = {
-    sm: "px-3.5 py-1.5 text-xs",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-7 py-3.5 text-base",
+    sm: "px-4 py-2 text-xs gap-1.5",
+    md: "px-5 py-2.5 text-sm gap-2",
+    lg: "px-7 py-3.5 text-base gap-2.5",
   };
 
   const variantStyles = {
     primary:
-      "bg-gradient-to-r from-[#D4AF37] via-[#F3CA52] to-[#D4AF37] text-[#07172F] shadow-lg shadow-[#D4AF37]/20 hover:brightness-110 active:scale-[0.98] font-bold border border-[#FDE047]/60",
+      "bg-[#2F4156] hover:bg-[#1E2B3A] text-white shadow-md shadow-[#2F4156]/20 hover:shadow-lg active:scale-[0.98] border border-[#2F4156] animate-shimmer",
     secondary:
-      "bg-[#0E2548] text-white hover:bg-[#143566] border border-[#D4AF37]/30 shadow-md active:scale-[0.98]",
+      "bg-[#567C8D] hover:bg-[#456573] text-white shadow-xs active:scale-[0.98] border border-[#567C8D]",
     outline:
-      "bg-transparent text-[#D4AF37] border-2 border-[#D4AF37] hover:bg-[#D4AF37]/10 active:scale-[0.98]",
+      "bg-white text-[#2F4156] border-2 border-[#2F4156] hover:bg-[#F5EEEB] hover:text-[#2F4156] active:scale-[0.98]",
     ghost:
-      "bg-transparent text-slate-200 hover:text-white hover:bg-white/10 active:scale-[0.98]",
+      "bg-transparent text-[#2F4156] hover:text-[#567C8D] hover:bg-[#F5EEEB]/60 active:scale-[0.98]",
   };
 
   const combinedClass = `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`;

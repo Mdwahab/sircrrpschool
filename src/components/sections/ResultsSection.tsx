@@ -1,91 +1,127 @@
+"use client";
+
 import React from "react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Achievement } from "@/lib/db/types";
-import { Trophy, Calendar, Award, FileText, CheckCircle2 } from "lucide-react";
+import { Calendar, Award, FileText, ShieldCheck, CheckCircle2, ArrowRight } from "lucide-react";
+import {
+  ScrollReveal,
+  ScrollStaggerContainer,
+  ScrollStaggerItem,
+} from "@/components/ui/ScrollAnimation";
 
 interface ResultsSectionProps {
   achievements: Achievement[];
 }
 
 export function ResultsSection({ achievements }: ResultsSectionProps) {
+  const publishedAchievements = achievements.filter((a) => a.is_published);
+
   return (
-    <section id="achievements" className="py-24 bg-[#051020] relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="results" className="py-20 sm:py-28 bg-white relative scroll-mt-20 overflow-hidden">
+      <div id="achievements" className="absolute -top-20" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <SectionHeading
-          badge="ACADEMIC MERIT &amp; HONORS"
-          title="Results &amp; Institutional Achievements"
-          subtitle="Celebrating consistent excellence in CBSE Board Examinations, national olympiads, and inter-school sports meets."
+          badge="ACADEMIC MERIT &amp; RECORDS"
+          title="Results &amp; Institutional Standing"
+          highlight="Institutional Standing"
+          subtitle="CBSE Board examination outcomes, academic standards, and verified student achievements."
         />
 
-        {achievements.length === 0 ? (
-          <div className="text-center py-12 glass-card rounded-2xl p-8 border border-slate-800">
-            <p className="text-slate-400 text-sm">
-              Official board achievement circulars are currently being compiled for publication.
-            </p>
+        {/* Accreditation & Academic Standing Banner: Scroll Reveal */}
+        <ScrollReveal className="max-w-4xl mx-auto mb-14 p-5 sm:p-6 rounded-3xl bg-white border border-[#C8D9E6] shadow-sm hover:shadow-md transition-all duration-300 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-[#F5EEEB] border border-[#C8D9E6] flex items-center justify-center text-[#2F4156] shrink-0 shadow-xs">
+              <ShieldCheck className="w-6 h-6 text-[#567C8D]" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-[#567C8D] uppercase tracking-wider font-mono">
+                Certified CBSE Board Academic Standing
+              </p>
+              <p className="text-xs sm:text-sm text-[#2F4156] font-semibold mt-0.5">
+                Affiliation No. 130072 | Senior Secondary Level (Classes LKG to XII)
+              </p>
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {achievements.map((item) => (
-              <div
-                key={item.id}
-                className="glass-card rounded-2xl p-6 sm:p-7 border border-[#D4AF37]/25 flex flex-col justify-between hover:border-[#D4AF37]/50 transition-all shadow-xl"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0E2548] border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-semibold">
-                      <Trophy className="w-3.5 h-3.5" />
-                      <span>{item.category}</span>
-                    </span>
+          <div className="flex items-center gap-2 text-xs font-bold text-[#2F4156] bg-[#F5EEEB] px-4 py-2 rounded-full border border-[#C8D9E6] shrink-0 shadow-2xs">
+            <CheckCircle2 className="w-4 h-4 text-[#567C8D]" />
+            <span>Official Institutional Records</span>
+          </div>
+        </ScrollReveal>
 
-                    <span className="flex items-center gap-1 text-xs text-slate-400 font-medium">
-                      <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" />
-                      <span>Year: {item.academic_year}</span>
-                    </span>
+        {publishedAchievements.length === 0 ? (
+          <ScrollReveal className="max-w-3xl mx-auto bg-white rounded-3xl p-8 sm:p-12 border border-[#C8D9E6] text-center shadow-md space-y-4 hover:shadow-lg transition-all duration-300">
+            <div className="w-14 h-14 rounded-2xl bg-[#F5EEEB] border border-[#C8D9E6] flex items-center justify-center text-[#567C8D] mx-auto shadow-xs">
+              <Award className="w-7 h-7 text-[#2F4156]" />
+            </div>
+            <h3 className="font-serif font-bold text-[#2F4156] text-xl sm:text-2xl">
+              Official CBSE Board Result Archive
+            </h3>
+            <p className="text-xs sm:text-sm text-[#567C8D] max-w-lg mx-auto leading-relaxed font-normal">
+              Official annual board result gazettes and topper recognitions are published here directly by the school administrative desk following formal CBSE announcements.
+            </p>
+            <p className="text-xs text-[#567C8D] font-medium">
+              To review verified historical score archives, parents may consult the administrative office during working hours.
+            </p>
+          </ScrollReveal>
+        ) : (
+          <ScrollStaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {publishedAchievements.map((item) => (
+              <ScrollStaggerItem key={item.id}>
+                <div className="bg-white rounded-3xl p-6 border border-[#C8D9E6] hover:border-[#567C8D] transition-all duration-300 flex flex-col justify-between space-y-4 shadow-xs hover:shadow-xl hover:-translate-y-1.5 h-full group">
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-[#2F4156] bg-[#C8D9E6]/35 border border-[#C8D9E6] font-mono">
+                        <Calendar className="w-3.5 h-3.5 text-[#567C8D]" />
+                        <span>{item.academic_year}</span>
+                      </span>
+
+                      {item.is_verified_record && (
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#2F4156] bg-[#F5EEEB] px-2.5 py-0.5 rounded-full border border-[#C8D9E6]">
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#567C8D]" />
+                          <span>Verified</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <h4 className="text-base font-serif font-bold text-[#2F4156] group-hover:text-[#567C8D] transition-colors leading-snug">
+                      {item.title}
+                    </h4>
+
+                    <p className="text-xs font-bold text-[#567C8D] uppercase tracking-wider mt-1 mb-2">
+                      {item.category}
+                    </p>
+
+                    <p className="text-xs sm:text-sm text-[#567C8D] leading-relaxed font-normal">
+                      {item.description}
+                    </p>
+
+                    {item.student_name && (
+                      <div className="mt-3.5 pt-2.5 border-t border-[#C8D9E6]/60 text-xs font-medium text-[#567C8D]">
+                        <span>Student: <strong className="text-[#2F4156] font-semibold">{item.student_name}</strong></span>
+                      </div>
+                    )}
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-bold text-white font-serif mb-2 leading-snug">
-                    {item.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
-                    {item.description}
-                  </p>
-
-                  {item.student_name && (
-                    <div className="flex items-center gap-2 text-xs text-amber-200/90 font-medium bg-[#0A1E3C] p-2.5 rounded-lg border border-slate-800">
-                      <Award className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
-                      <span>Honoree: {item.student_name}</span>
+                  {item.document_url && (
+                    <div className="pt-2">
+                      <a
+                        href={item.document_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2F4156] hover:text-[#567C8D] transition-colors group/link"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>View Gazette PDF</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
+                      </a>
                     </div>
                   )}
                 </div>
-
-                <div className="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between text-xs">
-                  <span className="inline-flex items-center gap-1 text-emerald-400 text-[11px] font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Verified School Record</span>
-                  </span>
-
-                  {item.document_url && (
-                    <a
-                      href={item.document_url}
-                      className="inline-flex items-center gap-1 text-[#D4AF37] font-semibold hover:underline"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Document Copy</span>
-                    </a>
-                  )}
-                </div>
-              </div>
+              </ScrollStaggerItem>
             ))}
-          </div>
+          </ScrollStaggerContainer>
         )}
-
-        {/* CBSE Mandate Note */}
-        <div className="mt-12 text-center text-xs text-slate-400 max-w-xl mx-auto">
-          <em>
-            * Published results reflect verified performance records of Sir C. R. Reddy Public School candidates in Central Board of Secondary Education examinations.
-          </em>
-        </div>
       </div>
     </section>
   );

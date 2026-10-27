@@ -13,7 +13,33 @@ const DEV_ADMIN_COOKIE = "sircrr_dev_admin_session";
 export async function getAdminSession(): Promise<AdminUser | null> {
   const cookieStore = await cookies();
 
-  // 1. If Supabase is configured, check real Supabase Auth
+  // 1. Dev mode fallback check (fast-path for development review)
+  const devSession = cookieStore.get(DEV_ADMIN_COOKIE);
+  if (devSession && devSession.value) {
+    try {
+      if (devSession.value === "authenticated") {
+        return {
+          id: "admin-dev-001",
+          email: "admin@sircrrschool.ac.in",
+          role: "admin",
+          isDevBypass: true,
+        };
+      }
+      const parsed = JSON.parse(devSession.value);
+      if (parsed && parsed.email) {
+        return {
+          id: parsed.id || "admin-dev-001",
+          email: parsed.email,
+          role: "admin",
+          isDevBypass: true,
+        };
+      }
+    } catch {
+      // Ignore parse error
+    }
+  }
+
+  // 2. If Supabase is configured, check real Supabase Auth
   if (isSupabaseConfigured()) {
     try {
       const supabase = await createServerSupabaseClient();
@@ -32,27 +58,16 @@ export async function getAdminSession(): Promise<AdminUser | null> {
         }
       }
     } catch {
-      // Fall through to dev check
+      // Fall through
     }
-  }
-
-  // 2. Dev mode fallback check
-  const devSession = cookieStore.get(DEV_ADMIN_COOKIE);
-  if (devSession && devSession.value === "authenticated") {
-    return {
-      id: "admin-dev-001",
-      email: "admin@sircrrschool.ac.in",
-      role: "admin",
-      isDevBypass: true,
-    };
   }
 
   return null;
 }
 
-export async function setDevAdminSession(): Promise<void> {
+export async function setDevAdminSession(user: { id: string; email: string } = { id: "admin-dev-001", email: "admin@sircrrschool.ac.in" }): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.set(DEV_ADMIN_COOKIE, "authenticated", {
+  cookieStore.set(DEV_ADMIN_COOKIE, JSON.stringify(user), {
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

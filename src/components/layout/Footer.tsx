@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import {
@@ -6,225 +8,184 @@ import {
   Mail,
   Clock,
   ShieldCheck,
-  ExternalLink,
 } from "lucide-react";
-import { SCHOOL_INFO, getWhatsAppEnquiryUrl } from "@/config/schoolInfo";
+import { SCHOOL_INFO } from "@/config/schoolInfo";
 
-export function Footer() {
+interface FooterProps {
+  settings?: Record<string, string>;
+}
+
+export function Footer({ settings }: FooterProps = {}) {
   const currentYear = new Date().getFullYear();
+  const campusAddress = settings?.campusAddress || SCHOOL_INFO.address.campus;
+  const pincode = settings?.pincode || SCHOOL_INFO.address.pincode;
+  const phoneOffice = settings?.phoneOffice || SCHOOL_INFO.contact.phoneOffice;
+  const phoneAlternative = settings?.phoneAlternative || SCHOOL_INFO.contact.phoneAlternative;
+  const emailOfficial = settings?.emailOfficial || SCHOOL_INFO.contact.emailOfficial;
+  const currentSession = settings?.currentAcademicSession || SCHOOL_INFO.admissions.currentAcademicSession;
 
   return (
-    <footer className="bg-[#030914] text-slate-300 border-t border-[#D4AF37]/25 pt-16 pb-8">
+    <footer className="bg-[#2F4156] text-[#C8D9E6] relative pt-8 pb-6 border-t-2 border-[#567C8D] overflow-hidden text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Col 1: Identity & Legacy */}
-          <div className="space-y-4">
+        {/* Compact 4-Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 lg:gap-8 mb-6">
+          {/* Col 1: Identity (4 cols) */}
+          <div className="lg:col-span-4 space-y-2.5">
             <div className="flex items-center gap-3">
-              <div className="relative w-12 h-12 flex-shrink-0">
+              <div className="relative w-10 h-10 flex-shrink-0 bg-white rounded-full border border-[#C8D9E6] shadow-xs overflow-hidden">
                 <Image
-                  src="/images/logo.svg"
+                  src="/images/schoollogo.png"
                   alt="Sir C. R. Reddy Public School Crest"
                   fill
-                  className="object-contain"
+                  sizes="40px"
+                  className="object-cover"
                 />
               </div>
-              <div>
-                <h3 className="font-serif font-bold text-white text-base leading-snug">
-                  Sir C. R. Reddy Public School
+              <div className="leading-tight">
+                <h3 className="font-serif font-bold text-white text-base whitespace-nowrap">
+                  Sir C. R. Reddy <span className="text-[#C8D9E6]">Public School</span>
                 </h3>
-                <p className="text-xs text-[#D4AF37]">
-                  Estd. 1984 • CBSE No. 130072
+                <p className="text-[11px] text-[#C8D9E6]/70 font-mono">
+                  Estd. 1984 | CBSE Affiliation No: 130072
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
-              An institution under Sir C. R. Reddy Educational Institutions
-              (Governing Body Estd. 1945), dedicated to providing holistic,
-              value-based senior secondary education grounded in discipline,
-              intellect, and national character.
+            <p className="text-[#C8D9E6]/80 leading-relaxed font-normal text-xs pr-4">
+              Under Sir C. R. Reddy Educational Institutions (Estd. 1945). Dedicated to values-grounded CBSE senior secondary education in Eluru, Andhra Pradesh.
             </p>
 
-            <div className="pt-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-[#0A1E3C] border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                Affiliation: CBSE New Delhi (130072)
+            <div className="pt-0.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1E2B3A] border border-[#567C8D]/60 text-white text-[11px] font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#C8D9E6]" />
+                <span>Senior Secondary Co-Educational</span>
               </span>
             </div>
           </div>
 
-          {/* Col 2: Quick Links */}
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white border-b border-[#D4AF37]/30 pb-2 mb-4">
+          {/* Col 2: Quick Links (3 cols) */}
+          <div className="lg:col-span-3 space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-[#3E556E] pb-1.5 mb-2 font-serif">
               Institutional Sections
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-1.5 text-xs text-[#C8D9E6]/80">
               <li>
-                <a
-                  href="#about"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>About &amp; Founding Legacy</span>
+                <a href="#about" className="hover:text-white transition-colors">
+                  About &amp; Founding Legacy
                 </a>
               </li>
               <li>
-                <a
-                  href="#academics"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Academics &amp; Curriculum (LKG – XII)</span>
+                <a href="#academics" className="hover:text-white transition-colors">
+                  Academics &amp; Curriculum (LKG – XII)
                 </a>
               </li>
               <li>
-                <a
-                  href="#facilities"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Laboratories &amp; Campus Facilities</span>
+                <a href="#facilities" className="hover:text-white transition-colors">
+                  Laboratories &amp; Campus Facilities
                 </a>
               </li>
               <li>
-                <a
-                  href="#principal"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Principal&apos;s Desk</span>
+                <a href="#principal" className="hover:text-white transition-colors">
+                  Principal&apos;s Desk
                 </a>
               </li>
               <li>
-                <a
-                  href="#gallery"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Campus Photo Gallery</span>
+                <a href="#results" className="hover:text-white transition-colors">
+                  CBSE Board Examination Results
                 </a>
               </li>
               <li>
-                <a
-                  href="#achievements"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Board Examination Results</span>
+                <a href="#gallery" className="hover:text-white transition-colors">
+                  Photo &amp; Media Gallery
                 </a>
               </li>
               <li>
-                <a
-                  href="#notices"
-                  className="hover:text-[#D4AF37] transition-colors flex items-center gap-1.5"
-                >
-                  <span>Official Circulars &amp; Notices</span>
+                <a href="#notices" className="hover:text-white transition-colors">
+                  Circulars &amp; Schedules
                 </a>
               </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Admissions & Compliance (2 cols) */}
+          <div className="lg:col-span-2 space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-[#3E556E] pb-1.5 mb-2 font-serif">
+              Admissions &amp; SARAS
+            </h4>
+            <ul className="space-y-1.5 text-xs text-[#C8D9E6]/80">
               <li>
                 <a
                   href="#admissions"
-                  className="text-[#D4AF37] font-semibold hover:underline flex items-center gap-1.5"
+                  className="text-white font-semibold hover:text-[#C8D9E6] transition-colors"
+                  suppressHydrationWarning
                 >
-                  <span>Admissions 2025–26 Enquiries</span>
+                  Admissions {currentSession}
+                </a>
+              </li>
+              <li>
+                <a href="#admissions" className="hover:text-white transition-colors">
+                  Prospectus &amp; Eligibility
+                </a>
+              </li>
+              <li>
+                <a href="#notices" className="hover:text-white transition-colors">
+                  CBSE SARAS Disclosure
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Verified Contact & Office */}
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white border-b border-[#D4AF37]/30 pb-2 mb-4">
-              School Campus &amp; Office
+          {/* Col 4: Administrative Desk Contact (3 cols) */}
+          <div className="lg:col-span-3 space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white border-b border-[#3E556E] pb-1.5 mb-2 font-serif">
+              Administrative Desk
             </h4>
-            <ul className="space-y-3 text-xs text-slate-300">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#D4AF37] flex-shrink-0 mt-0.5" />
-                <span>
-                  {SCHOOL_INFO.address.campus}, {SCHOOL_INFO.address.city},{" "}
-                  {SCHOOL_INFO.address.district},{" "}
-                  {SCHOOL_INFO.address.state} — Pin:{" "}
-                  <strong className="text-white">{SCHOOL_INFO.address.pincode}</strong>
+            <div className="space-y-2 text-xs text-[#C8D9E6]/80">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-3.5 h-3.5 text-[#C8D9E6] shrink-0 mt-0.5" />
+                <span className="leading-snug" suppressHydrationWarning>
+                  {campusAddress}, Eluru – {pincode}, A.P.
                 </span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
-                <a
-                  href={`tel:${SCHOOL_INFO.contact.phoneOffice}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {SCHOOL_INFO.contact.phoneOffice}
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#C8D9E6] shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-0.5">
+                  <a href={`tel:${phoneOffice.replace(/\s+/g, "")}`} className="hover:text-white font-mono font-bold text-white transition-colors" suppressHydrationWarning>
+                    {phoneOffice}
+                  </a>
+                  <a href={`tel:${phoneAlternative.replace(/\s+/g, "")}`} className="hover:text-white font-mono text-[#C8D9E6]/70 transition-colors" suppressHydrationWarning>
+                    +91 {phoneAlternative} (Admissions)
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#C8D9E6] shrink-0 mt-0.5" />
+                <a href={`mailto:${emailOfficial}`} className="hover:text-white font-mono text-[#C8D9E6] transition-colors" suppressHydrationWarning>
+                  {emailOfficial}
                 </a>
-                <span className="text-slate-500">•</span>
-                <span className="text-slate-400">{SCHOOL_INFO.contact.phoneAlternative}</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
-                <a
-                  href={`mailto:${SCHOOL_INFO.contact.emailOfficial}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {SCHOOL_INFO.contact.emailOfficial}
-                </a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-[#D4AF37] flex-shrink-0" />
-                <span className="text-slate-400">{SCHOOL_INFO.contact.officeTimings}</span>
-              </li>
-            </ul>
+              </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-800">
-              <a
-                href={SCHOOL_INFO.contact.websiteOfficial}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-[#D4AF37] hover:underline"
-              >
-                <span>Existing Web Portal: sircrrschool.ac.in</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-          </div>
-
-          {/* Col 4: Admissions & Direct Assistance */}
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white border-b border-[#D4AF37]/30 pb-2 mb-4">
-              Admissions Desk
-            </h4>
-            <p className="text-xs text-slate-400 mb-3">
-              Registrations open for Foundational to Senior Secondary streams
-              (Science &amp; Commerce) for the {SCHOOL_INFO.admissions.currentAcademicSession} academic year.
-            </p>
-
-            <div className="space-y-2">
-              <a
-                href="#admissions"
-                className="block text-center w-full px-4 py-2 rounded-lg bg-[#D4AF37] text-[#07172F] text-xs font-bold uppercase tracking-wider hover:brightness-105 shadow-md transition-all"
-              >
-                Submit Admission Enquiry
-              </a>
-              <a
-                href={getWhatsAppEnquiryUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-center w-full px-4 py-2 rounded-lg bg-[#0F3628] hover:bg-[#154a37] text-emerald-300 border border-emerald-500/40 text-xs font-semibold transition-all"
-              >
-                WhatsApp Admissions Enquiry
-              </a>
-            </div>
-
-            <div className="mt-5 p-2.5 rounded bg-[#07172F] border border-slate-800 text-[11px] text-slate-400">
-              <strong className="text-white block mb-0.5">CBSE SARAS Compliance</strong>
-              Mandatory Public Disclosure records available for inspection at the school administrative desk.
+              <div className="flex items-start gap-2">
+                <Clock className="w-3.5 h-3.5 text-[#C8D9E6] shrink-0 mt-0.5" />
+                <span>{SCHOOL_INFO.contact.officeTimings}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 mt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p className="text-center sm:text-left">
-            &copy; {currentYear} Sir C. R. Reddy Public School, Eluru. Managed by Sir C. R. Reddy Educational Institutions. All rights reserved.
+        {/* Compact Bottom Bar */}
+        <div className="pt-4 border-t border-[#3E556E] flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#C8D9E6]/70">
+          <p>
+            &copy; {currentYear} Sir C. R. Reddy Public School, Eluru. All Rights Reserved.
           </p>
 
-          <div className="flex items-center gap-4">
-            <span className="text-slate-500 text-[11px]">
-              CBSE Affiliation No: 130072
-            </span>
-          </div>
+          <p className="flex items-center gap-2 font-mono text-[11px] text-[#C8D9E6]/70">
+            <span>CBSE Affiliation No: 130072</span>
+            <span className="text-[#567C8D]">|</span>
+            <span>Co-Educational Senior Secondary</span>
+          </p>
         </div>
       </div>
     </footer>

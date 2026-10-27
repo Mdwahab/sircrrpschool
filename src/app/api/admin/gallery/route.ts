@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth/session";
 import { getAllGalleryImagesAdmin, saveGalleryImage, deleteGalleryImage } from "@/lib/db/service";
 
@@ -23,6 +24,13 @@ export async function POST(req: NextRequest) {
   }
 
   const saved = await saveGalleryImage(body);
+  try {
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/gallery");
+  } catch (err) {
+    console.warn("[REVALIDATE ERROR]", err);
+  }
   return NextResponse.json({ success: true, image: saved });
 }
 
@@ -39,5 +47,12 @@ export async function DELETE(req: NextRequest) {
   }
 
   await deleteGalleryImage(id);
+  try {
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/gallery");
+  } catch (err) {
+    console.warn("[REVALIDATE ERROR]", err);
+  }
   return NextResponse.json({ success: true });
 }

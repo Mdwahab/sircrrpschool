@@ -39,30 +39,31 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#040C18] border-r border-[#D4AF37]/25 flex flex-col justify-between h-screen sticky top-0">
+    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 z-20">
       <div>
         {/* Header / Brand */}
-        <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-          <div className="relative w-10 h-10 flex-shrink-0">
+        <div className="p-5 border-b border-[#C8D9E6] flex items-center gap-3 bg-[#F5EEEB]">
+          <div className="relative w-12 h-12 flex-shrink-0 bg-white rounded-full border-2 border-[#C8D9E6] shadow-xs overflow-hidden">
             <Image
-              src="/images/logo.svg"
+              src="/images/schoollogo.png"
               alt="Sir C. R. Reddy Crest"
               fill
-              className="object-contain"
+              sizes="48px"
+              className="object-cover"
             />
           </div>
           <div>
-            <h2 className="font-serif font-bold text-white text-sm leading-tight">
+            <h2 className="font-serif font-bold text-slate-900 text-sm leading-tight">
               Sir C.R. Reddy
             </h2>
-            <span className="text-[10px] text-[#D4AF37] font-semibold uppercase tracking-wider">
+            <span className="text-[10px] text-[#567C8D] font-bold uppercase tracking-wider">
               Administration Portal
             </span>
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav className="p-3 space-y-1" aria-label="Admin Navigation">
+        <nav className="p-3 space-y-1.5" aria-label="Admin Navigation">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -74,13 +75,13 @@ export function AdminSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                   isActive
-                    ? "bg-[#0E2548] text-[#D4AF37] border border-[#D4AF37]/40 shadow-sm"
-                    : "text-slate-300 hover:text-white hover:bg-[#0A1E3C]"
+                    ? "bg-[#C8D9E6]/30 text-[#2F4156] border-l-4 border-[#2F4156] shadow-2xs font-bold"
+                    : "text-slate-700 hover:text-[#2F4156] hover:bg-[#F5EEEB]"
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? "text-[#D4AF37]" : "text-slate-400"}`} />
+                <Icon className={`w-4 h-4 ${isActive ? "text-[#2F4156]" : "text-slate-500"}`} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -89,21 +90,23 @@ export function AdminSidebar() {
       </div>
 
       {/* Footer Actions */}
-      <div className="p-4 border-t border-slate-800 space-y-2">
-        <Link
+      <div className="p-4 border-t border-slate-100 space-y-2 bg-slate-50/50">
+        <a
           href="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-[#2F4156] hover:bg-[#F5EEEB] transition-colors border border-transparent hover:border-[#C8D9E6]"
         >
-          <ArrowLeft className="w-4 h-4 text-[#D4AF37]" />
+          <ArrowLeft className="w-4 h-4 text-[#567C8D]" />
           <span>View Public Website</span>
-        </Link>
+        </a>
 
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-red-300 hover:text-red-200 hover:bg-red-950/40 transition-colors cursor-pointer text-left"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#2F4156] hover:bg-[#F5EEEB] transition-colors cursor-pointer text-left border border-transparent hover:border-[#C8D9E6]"
         >
-          <LogOut className="w-4 h-4 text-red-400" />
+          <LogOut className="w-4 h-4 text-[#567C8D]" />
           <span>Sign Out</span>
         </button>
       </div>

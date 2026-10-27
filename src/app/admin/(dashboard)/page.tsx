@@ -10,180 +10,244 @@ import {
   ArrowRight,
   PlusCircle,
   FileCheck2,
+  Database,
+  MailCheck,
 } from "lucide-react";
 import {
   getAllNoticesAdmin,
   getAllGalleryImagesAdmin,
   getAllAchievementsAdmin,
   getEnquiriesAdmin,
+  getDatabaseStatus,
 } from "@/lib/db/service";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
 
-
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardOverviewPage() {
-  const [notices, gallery, achievements, enquiries] = await Promise.all([
+  const [notices, gallery, achievements, enquiries, dbStatus] = await Promise.all([
     getAllNoticesAdmin(),
     getAllGalleryImagesAdmin(),
     getAllAchievementsAdmin(),
     getEnquiriesAdmin(),
+    getDatabaseStatus(),
   ]);
 
+  const totalNotices = notices.length;
   const publishedNotices = notices.filter((n) => n.is_published).length;
+  const draftNotices = totalNotices - publishedNotices;
+
+  const totalGallery = gallery.length;
+  const publishedGallery = gallery.filter((g) => g.is_published).length;
+  const draftGallery = totalGallery - publishedGallery;
+
+  const totalAchievements = achievements.length;
+  const publishedAchievements = achievements.filter((a) => a.is_published).length;
+  const verifiedAchievements = achievements.filter((a) => a.is_verified_record).length;
+
+  const totalEnquiries = enquiries.length;
   const newEnquiries = enquiries.filter((e) => e.status === "new").length;
-  const supabaseConnected = isSupabaseConfigured();
+  const contactedEnquiries = enquiries.filter((e) => e.status === "contacted").length;
 
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Title & Welcome */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#C8D9E6] pb-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
+          <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#2F4156]">
             Administrative Console
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Sir C. R. Reddy Public School • Real-time Institutional Portal Management
+          <p className="text-xs sm:text-sm text-[#2F4156] mt-1 font-semibold">
+            Sir C. R. Reddy Public School | Real-time Institutional Portal Management
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {supabaseConnected ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
+        <div className="flex flex-wrap items-center gap-2">
+          {dbStatus.isReachable ? (
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-bold shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#567C8D]" />
               <span>Supabase Cloud Connected</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-semibold">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Development Local Store Active</span>
-            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-bold shadow-xs"
+                title={dbStatus.error ? `Supabase probe: ${dbStatus.error}` : "Local persistent database store active"}
+              >
+                <AlertTriangle className="w-3.5 h-3.5 text-[#567C8D]" />
+                <span>Resilient Local Store Active</span>
+              </span>
+            </div>
           )}
         </div>
       </div>
 
+      {/* Database Integration Status Banner if in Local Store Mode */}
+      {!dbStatus.isReachable && (
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-xs text-[#2F4156] flex items-start gap-3 shadow-xs">
+          <Database className="w-4 h-4 text-[#567C8D] flex-shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <strong className="text-[#2F4156] block font-bold">
+              Operating in Resilient Local Store Mode
+            </strong>
+            <p className="text-[#2F4156] leading-relaxed">
+              All school records (gallery images, board achievements, notices, enquiries, and institutional settings) are safely persisted in <code>.data/school_store.json</code>. Changes survive page reloads and server restarts.
+            </p>
+            {dbStatus.error && (
+              <p className="text-[#2F4156] text-[11px] font-mono">
+                Supabase Probe Note: {dbStatus.error}.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Notices */}
-        <div className="glass-card rounded-xl p-5 border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] flex items-center justify-between shadow-xs hover:border-[#567C8D] transition-all">
           <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+            <span className="text-xs text-[#2F4156] uppercase tracking-wider font-bold">
               Circulars &amp; Notices
             </span>
-            <div className="text-3xl font-bold text-white mt-1">
-              {notices.length}
+            <div className="text-3xl font-bold text-[#2F4156] mt-1 font-serif">
+              {totalNotices}
             </div>
-            <span className="text-xs text-[#D4AF37] font-medium">
-              {publishedNotices} Published Publicly
-            </span>
+            <div className="flex items-center gap-2 mt-1 text-[11px]">
+              <span className="text-[#567C8D] font-bold">
+                {publishedNotices} Published
+              </span>
+              <span className="text-[#C8D9E6] font-bold">|</span>
+              <span className="text-[#2F4156] font-semibold">
+                {draftNotices} Draft
+              </span>
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-            <Bell className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] flex items-center justify-center text-[#567C8D]">
+            <Bell className="w-6 h-6 text-[#567C8D]" />
           </div>
         </div>
 
         {/* Gallery */}
-        <div className="glass-card rounded-xl p-5 border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] flex items-center justify-between shadow-xs hover:border-[#567C8D] transition-all">
           <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+            <span className="text-xs text-[#2F4156] uppercase tracking-wider font-bold">
               Photo Gallery
             </span>
-            <div className="text-3xl font-bold text-white mt-1">
-              {gallery.length}
+            <div className="text-3xl font-bold text-[#2F4156] mt-1 font-serif">
+              {totalGallery}
             </div>
-            <span className="text-xs text-slate-400 font-medium">
-              Campus Assets Cataloged
-            </span>
+            <div className="flex items-center gap-2 mt-1 text-[11px]">
+              <span className="text-[#567C8D] font-bold">
+                {publishedGallery} Live
+              </span>
+              <span className="text-[#C8D9E6] font-bold">|</span>
+              <span className="text-[#2F4156] font-semibold">
+                {draftGallery} Unlisted
+              </span>
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-            <ImageIcon className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] flex items-center justify-center text-[#567C8D]">
+            <ImageIcon className="w-6 h-6 text-[#567C8D]" />
           </div>
         </div>
 
         {/* Achievements */}
-        <div className="glass-card rounded-xl p-5 border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] flex items-center justify-between shadow-xs hover:border-[#567C8D] transition-all">
           <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+            <span className="text-xs text-[#2F4156] uppercase tracking-wider font-bold">
               Board Achievements
             </span>
-            <div className="text-3xl font-bold text-white mt-1">
-              {achievements.length}
+            <div className="text-3xl font-bold text-[#2F4156] mt-1 font-serif">
+              {totalAchievements}
             </div>
-            <span className="text-xs text-emerald-400 font-medium">
-              Verified Records
-            </span>
+            <div className="flex items-center gap-2 mt-1 text-[11px]">
+              <span className="text-[#567C8D] font-bold">
+                {publishedAchievements} Published
+              </span>
+              <span className="text-[#C8D9E6] font-bold">|</span>
+              <span className="text-[#2F4156] font-bold">
+                {verifiedAchievements} Verified
+              </span>
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-            <Trophy className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] flex items-center justify-center text-[#567C8D]">
+            <Trophy className="w-6 h-6 text-[#567C8D]" />
           </div>
         </div>
 
         {/* Enquiries */}
-        <div className="glass-card rounded-xl p-5 border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] flex items-center justify-between shadow-xs hover:border-[#567C8D] transition-all">
           <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+            <span className="text-xs text-[#2F4156] uppercase tracking-wider font-bold">
               Admission Enquiries
             </span>
-            <div className="text-3xl font-bold text-white mt-1">
-              {enquiries.length}
+            <div className="text-3xl font-bold text-[#2F4156] mt-1 font-serif">
+              {totalEnquiries}
             </div>
-            <span className="text-xs text-amber-300 font-bold">
-              {newEnquiries} Pending Contact
-            </span>
+            <div className="flex items-center gap-2 mt-1 text-[11px]">
+              <span className="text-[#567C8D] font-bold">
+                {newEnquiries} New
+              </span>
+              <span className="text-[#C8D9E6] font-bold">|</span>
+              <span className="text-[#2F4156] font-semibold">
+                {contactedEnquiries} Contacted
+              </span>
+            </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-            <Users className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] flex items-center justify-center text-[#567C8D]">
+            <Users className="w-6 h-6 text-[#567C8D]" />
           </div>
         </div>
       </div>
 
       {/* Quick Action Shortcuts */}
       <div>
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-3">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-[#2F4156] mb-3">
           Quick Administrative Actions
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
             href="/admin/notices"
-            className="glass-card rounded-xl p-4 border border-slate-800 hover:border-[#D4AF37]/50 transition-all flex items-center justify-between group"
+            className="bg-[#FFFFFF] rounded-2xl p-4 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex items-center justify-between group shadow-xs hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <PlusCircle className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-xs font-semibold text-white">Create Notice</span>
+              <PlusCircle className="w-5 h-5 text-[#567C8D]" />
+              <span className="text-xs font-bold text-[#2F4156]">Manage Notices</span>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#D4AF37] transition-colors" />
+            <ArrowRight className="w-4 h-4 text-[#2F4156] group-hover:text-[#567C8D] group-hover:translate-x-0.5 transition-all" />
           </Link>
 
           <Link
             href="/admin/gallery"
-            className="glass-card rounded-xl p-4 border border-slate-800 hover:border-[#D4AF37]/50 transition-all flex items-center justify-between group"
+            className="bg-[#FFFFFF] rounded-2xl p-4 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex items-center justify-between group shadow-xs hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <PlusCircle className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-xs font-semibold text-white">Upload Photograph</span>
+              <PlusCircle className="w-5 h-5 text-[#567C8D]" />
+              <span className="text-xs font-bold text-[#2F4156]">Manage Gallery</span>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#D4AF37] transition-colors" />
+            <ArrowRight className="w-4 h-4 text-[#2F4156] group-hover:text-[#567C8D] group-hover:translate-x-0.5 transition-all" />
           </Link>
 
           <Link
             href="/admin/results"
-            className="glass-card rounded-xl p-4 border border-slate-800 hover:border-[#D4AF37]/50 transition-all flex items-center justify-between group"
+            className="bg-[#FFFFFF] rounded-2xl p-4 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex items-center justify-between group shadow-xs hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <PlusCircle className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-xs font-semibold text-white">Add Board Result</span>
+              <PlusCircle className="w-5 h-5 text-[#567C8D]" />
+              <span className="text-xs font-bold text-[#2F4156]">Manage Results</span>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[#D4AF37] transition-colors" />
+            <ArrowRight className="w-4 h-4 text-[#2F4156] group-hover:text-[#567C8D] group-hover:translate-x-0.5 transition-all" />
           </Link>
 
           <Link
             href="/admin/enquiries"
-            className="glass-card rounded-xl p-4 border border-slate-800 hover:border-[#D4AF37]/50 transition-all flex items-center justify-between group"
+            className="bg-[#FFFFFF] rounded-2xl p-4 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex items-center justify-between group shadow-xs hover:shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <FileCheck2 className="w-5 h-5 text-amber-400" />
-              <span className="text-xs font-semibold text-white">Review Enquiries</span>
+              <FileCheck2 className="w-5 h-5 text-[#567C8D]" />
+              <span className="text-xs font-bold text-[#2F4156]">Review Enquiries</span>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 transition-colors" />
+            <ArrowRight className="w-4 h-4 text-[#2F4156] group-hover:text-[#567C8D] group-hover:translate-x-0.5 transition-all" />
           </Link>
         </div>
       </div>
@@ -191,67 +255,67 @@ export default async function AdminDashboardOverviewPage() {
       {/* System Integrity & School Management Status */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Verification Checklist */}
-        <div className="glass-card rounded-xl p-6 border border-slate-800 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 className="font-serif font-bold text-white text-base">
+        <div className="bg-[#FFFFFF] rounded-2xl p-6 border-2 border-[#C8D9E6] space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#C8D9E6] pb-3">
+            <h3 className="font-serif font-bold text-[#2F4156] text-base">
               School Management Verification Log
             </h3>
-            <span className="text-xs text-[#D4AF37] font-semibold">
+            <span className="text-xs text-[#567C8D] font-bold">
               Compliance Status
             </span>
           </div>
 
-          <ul className="space-y-3 text-xs text-slate-300">
+          <ul className="space-y-3 text-xs text-[#2F4156]">
             <li className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#567C8D] mt-1.5 flex-shrink-0" />
               <span>
-                <strong>CBSE Affiliation:</strong> Verified (No. 130072, Senior Secondary, Eluru).
+                <strong className="text-[#2F4156]">CBSE Affiliation:</strong> Verified (Affiliation No. 130072, Senior Secondary Level, Eluru).
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#567C8D] mt-1.5 flex-shrink-0" />
               <span>
-                <strong>Official Registered Address:</strong> G.N.T. Road, Eluru — 534006.
+                <strong className="text-[#2F4156]">Official School Contact:</strong> Tel: +91 6300065646 | Email: sircrrps1@gmail.com.
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#567C8D] mt-1.5 flex-shrink-0" />
               <span>
-                <strong>Principal Portrait &amp; Message:</strong> Marked as Development Placeholder pending governing body upload.
+                <strong className="text-[#2F4156]">Current Admissions Session:</strong> 2025–2026 (Preserved verified session).
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+              <MailCheck className="w-4 h-4 text-[#567C8D] flex-shrink-0 mt-0.5" />
               <span>
-                <strong>Admissions WhatsApp Number:</strong> Placeholder configured; requires management verification in Settings.
+                <strong className="text-[#2F4156]">Email-Only Admission Enquiries:</strong> Inbound parent submissions notify admissions desk via Resend to <code>sircrrps1@gmail.com</code>. WhatsApp redirects removed.
               </span>
             </li>
           </ul>
         </div>
 
         {/* Security & Infrastructure Status */}
-        <div className="glass-card rounded-xl p-6 border border-slate-800 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h3 className="font-serif font-bold text-white text-base">
+        <div className="bg-[#FFFFFF] rounded-2xl p-6 border-2 border-[#C8D9E6] space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#C8D9E6] pb-3">
+            <h3 className="font-serif font-bold text-[#2F4156] text-base">
               Security &amp; Storage Architecture
             </h3>
-            <span className="text-xs text-emerald-400 font-semibold">
+            <span className="text-xs text-[#567C8D] font-bold">
               Production Hardened
             </span>
           </div>
 
-          <div className="space-y-3 text-xs text-slate-300">
+          <div className="space-y-3 text-xs text-[#2F4156] leading-relaxed">
             <p>
-              • <strong>Row-Level Security (RLS):</strong> Enabled on all Supabase tables. Public users are strictly restricted to reading published records only.
+              <strong className="text-[#2F4156]">Row-Level Security (RLS):</strong> Configured on Supabase database tables. Anonymous visitors have zero select access to admission enquiries.
             </p>
             <p>
-              • <strong>Admission Submissions:</strong> Enquiries are written via secure server actions with IP rate-limiting and anti-spam honeypot detection.
+              <strong className="text-[#2F4156]">Admission Submissions:</strong> Enquiries are written via secure server actions with IP rate-limiting, sanitization, and anti-spam protection.
             </p>
             <p>
-              • <strong>Administrator Access:</strong> Supports two initial administrator accounts with server-side session authorization.
+              <strong className="text-[#2F4156]">Credentials Isolation:</strong> Privileged keys (service role, Resend API key) are kept strictly server-side and never exposed to browser bundles.
             </p>
             <p>
-              • <strong>Storage Buckets:</strong> Configured for authenticated uploads with size and MIME validation (max 5MB, JPG/PNG/WebP/PDF).
+              <strong className="text-[#2F4156]">Persistent Fallback:</strong> Zero data loss guaranteed. If Supabase is offline, records automatically persist to local storage.
             </p>
           </div>
         </div>

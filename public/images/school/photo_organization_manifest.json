@@ -1,0 +1,388 @@
+[
+  {
+    "src": "compas2.jpg",
+    "category": "campus",
+    "destFilename": "campus-aerial-panorama.jpg",
+    "title": "Campus Aerial Panorama & Grounds",
+    "description": "High-resolution drone panorama of the Sir C.R. Reddy Public School campus and surrounding grounds."
+  },
+  {
+    "src": "school_campas.jpg",
+    "category": "campus",
+    "destFilename": "main-academic-building-elevation.jpg",
+    "title": "Main Academic Complex Elevation",
+    "description": "Front exterior architectural view of the multi-storey academic school building."
+  },
+  {
+    "src": "compas1.jpg",
+    "category": "campus",
+    "destFilename": "gate-2-campus-entrance.jpg",
+    "title": "Gate 2 Entrance & CBSE Board",
+    "description": "School Gate 2 main entrance featuring official CBSE affiliation details and landscaped perimeter."
+  },
+  {
+    "src": "spot6.jpg",
+    "category": "campus",
+    "destFilename": "campus-assembly-quadrangle-overview.jpg",
+    "title": "School Assembly Quadrangle Overview",
+    "description": "Elevated campus panorama showing the central quadrangle and open grounds."
+  },
+  {
+    "src": "class_room1.jpg",
+    "category": "classrooms",
+    "destFilename": "physics-interactive-classroom.jpg",
+    "title": "Secondary Physics Class & Interactive Display",
+    "description": "Interactive secondary physics classroom with Rutherford atomic scattering diagrams and student seating."
+  },
+  {
+    "src": "class_room2.jpg",
+    "category": "classrooms",
+    "destFilename": "smart-digital-classroom.jpg",
+    "title": "Smart Interactive Digital Classroom",
+    "description": "Air-conditioned smart classroom equipped with touch-interactive digital panel and modern seating."
+  },
+  {
+    "src": "digital_class_room.jpg",
+    "category": "classrooms",
+    "destFilename": "interactive-smart-board-classroom.jpg",
+    "title": "Smart Digital Classroom Broadcast",
+    "description": "Digital classroom featuring large smart LED screen for multimedia teaching and video lessons."
+  },
+  {
+    "src": "digital_class_room_1.jpg",
+    "category": "classrooms",
+    "destFilename": "audiovisual-projection-hall.jpg",
+    "title": "Audiovisual Media & Projection Hall",
+    "description": "Modern audio-visual projection classroom for interactive multimedia presentations."
+  },
+  {
+    "src": "library.jpg",
+    "category": "library",
+    "destFilename": "school-library-reading-hall.jpg",
+    "title": "School Library & Reference Reading Hall",
+    "description": "Spacious school library reading hall featuring book stacks, periodicals, and study tables."
+  },
+  {
+    "src": "library1.jpg",
+    "category": "library",
+    "destFilename": "library-research-study-bay.jpg",
+    "title": "Library Academic Research & Study Bay",
+    "description": "Dedicated reference stacks and research study bays with encyclopedias and academic journals."
+  },
+  {
+    "src": "computer_lab.jpg",
+    "category": "laboratories",
+    "destFilename": "computer-technology-lab.jpg",
+    "title": "Computer & Information Technology Lab",
+    "description": "Air-conditioned ICT lab with individual networked desktop workstations and broadband connectivity."
+  },
+  {
+    "src": "secine_lab1.jpg",
+    "category": "laboratories",
+    "destFilename": "chemistry-titration-practical-lab.jpg",
+    "title": "Senior Chemistry Practical Titration",
+    "description": "Fully equipped senior chemistry laboratory featuring titration stands, burettes, and chemical reagents."
+  },
+  {
+    "src": "secine_lab.jpg",
+    "category": "laboratories",
+    "destFilename": "annual-science-fair-exhibition.jpg",
+    "title": "Annual Science Fair & Working Models",
+    "description": "Students presenting working scientific models, renewable energy exhibits, and biology projects."
+  },
+  {
+    "src": "lab.jpg",
+    "category": "laboratories",
+    "destFilename": "science-laboratory-apparatus.jpg",
+    "title": "Science Practical Apparatus Demonstration",
+    "description": "Laboratory demonstration counter with optical lenses, glassware, and scientific measuring instruments."
+  },
+  {
+    "src": "ground.jpg",
+    "category": "sports",
+    "destFilename": "school-sports-ground-and-track.jpg",
+    "title": "Athletics Field & Sports Playgrounds",
+    "description": "Expansive outdoor athletic field with running tracks, cricket pitch, and sports courts."
+  },
+  {
+    "src": "spots.jpg",
+    "category": "sports",
+    "destFilename": "inter-school-table-tennis-tournament.jpg",
+    "title": "Inter-School Table Tennis Tournament Match",
+    "description": "Inter-school table tennis tournament match in progress with umpire scoring and spectators."
+  },
+  {
+    "src": "spot2.jpg",
+    "category": "sports",
+    "destFilename": "table-tennis-tournament-singles-match.jpg",
+    "title": "Table Tennis Championship Tournament Action",
+    "description": "Competitive singles match play during the CBSE Cluster VII Table Tennis Championship."
+  },
+  {
+    "src": "spot3.jpg",
+    "category": "sports",
+    "destFilename": "table-tennis-tournament-doubles-rally.jpg",
+    "title": "Table Tennis Doubles Competitive Rally",
+    "description": "Doubles match action during the regional CBSE sports competition."
+  },
+  {
+    "src": "spot4.jpg",
+    "category": "sports",
+    "destFilename": "cbse-table-tennis-match-play.jpg",
+    "title": "CBSE Cluster VII Tournament Match Play",
+    "description": "Intense rally during official tournament play under certified sports arbiters."
+  },
+  {
+    "src": "spot5.jpg",
+    "category": "sports",
+    "destFilename": "indoor-table-tennis-sports-hall.jpg",
+    "title": "Indoor Sports Complex Table Tennis Rally",
+    "description": "Indoor sports complex facility hosting championship sports meets."
+  },
+  {
+    "src": "spot10.jpg",
+    "category": "sports",
+    "destFilename": "cbse-cluster-championship-trophies.jpg",
+    "title": "CBSE Cluster VII Championship Trophies",
+    "description": "Trophy showcase and official medals won by school teams at the CBSE Cluster VII meet."
+  },
+  {
+    "src": "spot11.jpg",
+    "category": "sports",
+    "destFilename": "u14-girls-table-tennis-champions.jpg",
+    "title": "CBSE Cluster VII Under-14 Girls Champions",
+    "description": "Sir C.R. Reddy Public School Under-14 Girls squad holding winner trophies and certificates."
+  },
+  {
+    "src": "spot12.jpg",
+    "category": "sports",
+    "destFilename": "sports-gold-medal-award-ceremony.jpg",
+    "title": "Tournament Gold Medal & Certificate Award",
+    "description": "Gold medal and citation presentation to triumphant student athlete on the victory podium."
+  },
+  {
+    "src": "spot13.jpg",
+    "category": "sports",
+    "destFilename": "sports-championship-felicitation.jpg",
+    "title": "Championship Trophy Felicitation Ceremony",
+    "description": "Felicitation ceremony recognizing championship-winning student athletes."
+  },
+  {
+    "src": "graduation_day.jpg",
+    "category": "celebrations",
+    "destFilename": "graduation-day-welcome-dance.jpg",
+    "title": "Graduation Day Classical Welcome Dance",
+    "description": "Inaugural classical invocation dance presented by senior students at Graduation Day."
+  },
+  {
+    "src": "graduation_day1.jpg",
+    "category": "celebrations",
+    "destFilename": "kuchipudi-classical-dance-duo.jpg",
+    "title": "Kuchipudi Stage Performance Duo",
+    "description": "Kuchipudi classical dance duo performing on the ceremonial stage."
+  },
+  {
+    "src": "graduation_day2.jpg",
+    "category": "celebrations",
+    "destFilename": "graduation-cultural-choreography.jpg",
+    "title": "Graduation Ceremony Cultural Choreography",
+    "description": "Ensemble classical choreography celebrating graduation festivities."
+  },
+  {
+    "src": "graduation_day3.jpg",
+    "category": "celebrations",
+    "destFilename": "classical-temple-dance-solo.jpg",
+    "title": "Classical Temple Dance Soloist",
+    "description": "Solo classical performance celebrating the heritage and traditions of the institution."
+  },
+  {
+    "src": "graduation_day5.jpg",
+    "category": "celebrations",
+    "destFilename": "primary-student-stage-recitation.jpg",
+    "title": "Primary School Student Stage Recitation",
+    "description": "Primary school student delivering stage recitation at the graduation ceremony."
+  },
+  {
+    "src": "graduation_day6.jpg",
+    "category": "celebrations",
+    "destFilename": "kindergarten-graduation-robes.jpg",
+    "title": "Kindergarten Graduation Ceremony (Cap & Gown)",
+    "description": "Kindergarten graduates in black and royal-blue gowns and mortarboards receiving awards."
+  },
+  {
+    "src": "graduation_day7.jpg",
+    "category": "celebrations",
+    "destFilename": "graduation-certificate-presentation.jpg",
+    "title": "Annual Graduation Scroll & Certificate Presentation",
+    "description": "Presentation of graduation scrolls and merit citations by institutional dignitaries."
+  },
+  {
+    "src": "graduation_day8.jpg",
+    "category": "celebrations",
+    "destFilename": "ukg-graduate-felicitation.jpg",
+    "title": "UKG Graduate Felicitation on Stage",
+    "description": "UKG student recognized on stage during the annual graduation celebrations."
+  },
+  {
+    "src": "graduation_day9.jpg",
+    "category": "celebrations",
+    "destFilename": "kindergarten-graduating-cohort.jpg",
+    "title": "Kindergarten Graduating Cohort & Faculty",
+    "description": "Graduating kindergarten cohort with faculty mentors and teachers on stage."
+  },
+  {
+    "src": "event4.jpg",
+    "category": "celebrations",
+    "destFilename": "sahasragalarchana-dance-troupe.jpg",
+    "title": "Sahasragalarchana Classical Dance Troupe",
+    "description": "Grand classical dance troupe performing in traditional yellow and red attire at Sahasragalarchana."
+  },
+  {
+    "src": "event5.jpg",
+    "category": "celebrations",
+    "destFilename": "celebration-musical-choir.jpg",
+    "title": "Graduation Day Musical Choral Presentation",
+    "description": "Student choir singing harmonic celebratory hymns during Graduation Day."
+  },
+  {
+    "src": "event.jpg",
+    "category": "events",
+    "destFilename": "aahlad-cultural-lamp-lighting.jpg",
+    "title": "Aahlad Cultural Fiesta Prayer Invocation",
+    "description": "Dignitaries and faculty lighting the ceremonial brass lamp to inaugurate Aahlad cultural festival."
+  },
+  {
+    "src": "event1.jpg",
+    "category": "events",
+    "destFilename": "inaugural-choir-performance.jpg",
+    "title": "Student Vocal Choir & Inauguration Ceremony",
+    "description": "Student vocal choir opening the annual cultural festival with devotional songs."
+  },
+  {
+    "src": "event2.jpg",
+    "category": "events",
+    "destFilename": "cultural-fiesta-stage-proceedings.jpg",
+    "title": "School Cultural Fiesta Stage Proceedings",
+    "description": "Cultural evening stage presentations and celebrations attended by parents and alumni."
+  },
+  {
+    "src": "unity_run.jpg",
+    "category": "events",
+    "destFilename": "national-unity-day-ncc-rally.jpg",
+    "title": "National Unity Day Rally & NCC Cadets Formation",
+    "description": "NCC cadet corps leading the National Unity Day community run in Eluru."
+  },
+  {
+    "src": "schoolbus.jpg",
+    "category": "facilities",
+    "destFilename": "school-transport-bus-fleet.jpg",
+    "title": "Campus Transport Service Fleet",
+    "description": "Fleet of dedicated yellow Tata Marcopolo school buses providing secure transit across Eluru."
+  },
+  {
+    "src": "event3.jpg",
+    "category": "facilities",
+    "destFilename": "kanchanamala-kalavedika-stage.jpg",
+    "title": "Dr. K. Kanchanamala Kalavedika Cultural Stage",
+    "description": "Permanent outdoor stage and auditorium facility for cultural programs and gatherings."
+  },
+  {
+    "src": "activeity.jpg",
+    "category": "students-and-activities",
+    "destFilename": "morning-assembly-pledge.jpg",
+    "title": "National Pledge Recitation at Morning Assembly",
+    "description": "Students standing at attention taking the National Pledge during morning assembly."
+  },
+  {
+    "src": "activeity1.jpg",
+    "category": "students-and-activities",
+    "destFilename": "assembly-student-speech.jpg",
+    "title": "Student Assembly Address & Thematic Speech",
+    "description": "Student delivering an inspirational thematic morning speech at the podium microphone."
+  },
+  {
+    "src": "activeity2.jpg",
+    "category": "students-and-activities",
+    "destFilename": "assembly-thought-for-the-day.jpg",
+    "title": "Daily Thought for the Day & Student Reading",
+    "description": "Student sharing the daily moral thought and news updates with the student assembly."
+  },
+  {
+    "src": "activeity3.jpg",
+    "category": "students-and-activities",
+    "destFilename": "assembly-student-anchoring.jpg",
+    "title": "Morning Assembly Anchoring & Student Leadership",
+    "description": "Student leader anchoring the morning assembly proceedings."
+  },
+  {
+    "src": "activeity4.jpg",
+    "category": "students-and-activities",
+    "destFilename": "assembly-student-presentation.jpg",
+    "title": "Assembly Presentation by Student Council",
+    "description": "Student Council members coordinating and presenting assembly programs."
+  },
+  {
+    "src": "spot8.jpg",
+    "category": "students-and-activities",
+    "destFilename": "whole-school-assembly-formation.jpg",
+    "title": "Whole-School Morning Assembly Gathering",
+    "description": "Disciplined student columns assembled across the campus quadrangle."
+  },
+  {
+    "src": "yoga.jpg",
+    "category": "students-and-activities",
+    "destFilename": "mass-student-yoga-session.jpg",
+    "title": "Mass Yoga Session in School Auditorium",
+    "description": "Students practicing mindfulness, breathing, and physical wellness during yoga session."
+  },
+  {
+    "src": "yoga1.jpg",
+    "category": "students-and-activities",
+    "destFilename": "guided-yoga-asana-practice.jpg",
+    "title": "Yoga Asana & Pranayama Guided Practice",
+    "description": "Instructor-guided yoga asana demonstrations promoting student focus and wellbeing."
+  },
+  {
+    "src": "medicinalplantsgraden1.jpg",
+    "category": "students-and-activities",
+    "destFilename": "botany-field-study-herb-identification.jpg",
+    "title": "Botany Field Study & Medicinal Plant Identification",
+    "description": "Students participating in hands-on botanical fieldwork identifying therapeutic flora."
+  },
+  {
+    "src": "medicinalplantsgraden2.jpg",
+    "category": "students-and-activities",
+    "destFilename": "herbal-flora-cultivation-beds.jpg",
+    "title": "Herbal Flora Cultivation & Study Beds",
+    "description": "Dedicated botanical cultivation plots and labeled nursery beds for environmental science."
+  },
+  {
+    "src": "spot7.jpg",
+    "category": "staff-and-principal",
+    "destFilename": "principal-morning-assembly-address.jpg",
+    "title": "Principal's Morning Address at Kalavedika Stage",
+    "description": "School Principal and faculty members addressing the student body from the dais."
+  },
+  {
+    "src": "spot9.jpg",
+    "category": "staff-and-principal",
+    "destFilename": "faculty-supervising-assembly.jpg",
+    "title": "Assembly Gathering & Faculty Supervision",
+    "description": "School faculty and teachers guiding and supervising morning student assembly lines."
+  },
+  {
+    "src": "medicinalplantsgraden.jpg",
+    "category": "gallery",
+    "destFilename": "medicinal-plants-garden-entrance.jpg",
+    "title": "Medicinal Plants Garden Excursion Entrance",
+    "description": "Entrance gate and archway to the institutional medicinal plants garden and botanical sanctuary."
+  },
+  {
+    "src": "ground1.jpg",
+    "category": "review-needed",
+    "destFilename": "campus-ground-perimeter-boundary.jpg",
+    "title": "Campus Athletic Field Perimeter Boundary",
+    "description": "Wide boundary perimeter photograph showing outer fence and tree line adjoining the athletic field. Placed in review-needed due to dual context (sports grounds vs campus boundary perimeter).",
+    "reviewReason": "Photograph captures the outer boundary fence and perimeter tree line of the playground. Could be classified under sports/ (as field perimeter) or campus/ (as campus grounds/perimeter). Placed here to prevent inaccurate guessing."
+  }
+]

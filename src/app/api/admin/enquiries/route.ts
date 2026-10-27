@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth/session";
 import { getEnquiriesAdmin, updateEnquiryStatus } from "@/lib/db/service";
 import { EnquiryStatus } from "@/lib/db/types";
@@ -26,6 +27,13 @@ export async function PATCH(req: NextRequest) {
   const updated = await updateEnquiryStatus(id, status as EnquiryStatus, notes);
   if (!updated) {
     return NextResponse.json({ error: "Enquiry record not found" }, { status: 404 });
+  }
+
+  try {
+    revalidatePath("/admin");
+    revalidatePath("/admin/enquiries");
+  } catch (err) {
+    console.warn("[REVALIDATE ERROR]", err);
   }
 
   return NextResponse.json({ success: true, enquiry: updated });

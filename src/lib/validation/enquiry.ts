@@ -1,3 +1,5 @@
+import { SCHOOL_INFO } from "@/config/schoolInfo";
+
 export interface EnquiryFormData {
   parent_name: string;
   student_name: string;
@@ -19,7 +21,7 @@ export interface ValidationResult {
 // In-memory rate limiting map: ip -> timestamps[]
 const rateLimitMap = new Map<string, number[]>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 4; // Max 4 submissions per minute per IP
+const MAX_REQUESTS_PER_WINDOW = 10; // Max 10 submissions per minute per IP
 
 export function checkRateLimit(clientIdentifier: string): boolean {
   const now = Date.now();
@@ -36,6 +38,13 @@ export function checkRateLimit(clientIdentifier: string): boolean {
   return true;
 }
 
+export function sanitizeInput(str: string): string {
+  return str
+    .replace(/<[^>]*>/g, "") // Strip HTML tags
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "") // Strip control characters
+    .trim();
+}
+
 export function validateEnquiryForm(data: Partial<EnquiryFormData>): ValidationResult {
   const errors: Record<string, string> = {};
 
@@ -45,16 +54,16 @@ export function validateEnquiryForm(data: Partial<EnquiryFormData>): ValidationR
     return { isValid: false, errors };
   }
 
-  // 2. Parent Name
-  const parentName = data.parent_name?.trim() || "";
+  // 2. Parent Name (sanitized, 2-80 characters)
+  const parentName = sanitizeInput(data.parent_name || "");
   if (!parentName) {
     errors.parent_name = "Parent or guardian name is required.";
   } else if (parentName.length < 2 || parentName.length > 80) {
-    errors.parent_name = "Name must be between 2 and 80 characters.";
+    errors.parent_name = "Parent name must be between 2 and 80 characters.";
   }
 
-  // 3. Student Name
-  const studentName = data.student_name?.trim() || "";
+  // 3. Student Name (sanitized, 2-80 characters)
+  const studentName = sanitizeInput(data.student_name || "");
   if (!studentName) {
     errors.student_name = "Student name is required.";
   } else if (studentName.length < 2 || studentName.length > 80) {
@@ -64,11 +73,12 @@ export function validateEnquiryForm(data: Partial<EnquiryFormData>): ValidationR
   // 4. Phone Number (Indian mobile format: 10 digits starting with 6, 7, 8, or 9)
   const phoneClean = (data.phone || "").replace(/[^0-9]/g, "");
   // Allow leading 91 or 0
-  const normalizedPhone = phoneClean.length === 12 && phoneClean.startsWith("91")
-    ? phoneClean.slice(2)
-    : phoneClean.length === 11 && phoneClean.startsWith("0")
-    ? phoneClean.slice(1)
-    : phoneClean;
+  const normalizedPhone =
+    phoneClean.length === 12 && phoneClean.startsWith("91")
+      ? phoneClean.slice(2)
+      : phoneClean.length === 11 && phoneClean.startsWith("0")
+      ? phoneClean.slice(1)
+      : phoneClean;
 
   const phoneRegex = /^[6-9]\d{9}$/;
   if (!normalizedPhone) {
@@ -77,29 +87,32 @@ export function validateEnquiryForm(data: Partial<EnquiryFormData>): ValidationR
     errors.phone = "Please enter a valid 10-digit Indian mobile number (e.g. 9848012345).";
   }
 
-  // 5. Email (Optional)
-  const email = data.email?.trim() || "";
-  if (email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+  // 5. Email (Optional, validated and capped at 100 characters)
+  const emailRaw = sanitizeInput(data.email || "");
+  let email: string | undefined = undefined;
+  if (emailRaw) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(emailRaw)) {
       errors.email = "Please enter a valid email address.";
+    } else if (emailRaw.length > 100) {
+      errors.email = "Email must not exceed 100 characters.";
+    } else {
+      email = emailRaw.toLowerCase();
     }
   }
 
   // 6. Grade of Interest
-  const grade = data.grade_applying?.trim() || "";
+  const grade = sanitizeInput(data.grade_applying || "");
   if (!grade) {
     errors.grade_applying = "Please select the class or grade of interest.";
   }
 
   // 7. Academic Year
-  const academicYear = data.academic_year?.trim() || "2025–2026";
+  const academicYear = sanitizeInput(data.academic_year || "") || SCHOOL_INFO.admissions.currentAcademicSession;
 
-  // 8. Message / Note (Optional, capped at 1000 characters)
-  const message = data.message?.trim() || "";
-  if (message.length > 1000) {
-    errors.message = "Message must not exceed 1000 characters.";
-  }
+  // 8. Message / Note (Optional, sanitized, capped at 1000 characters)
+  const messageRaw = sanitizeInput(data.message || "");
+  const message = messageRaw.length > 1000 ? messageRaw.slice(0, 1000) : messageRaw;
 
   // 9. Consent
   if (!data.consent) {

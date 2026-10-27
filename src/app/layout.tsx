@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SCHOOL_INFO } from "@/config/schoolInfo";
-
-const jakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-  variable: "--font-sans",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sircrrschool.ac.in"),
   title: "Sir C. R. Reddy Public School | CBSE Affiliated Senior Secondary, Eluru",
-  description:
-    "Official website for Sir C. R. Reddy Public School, Eluru (CBSE Affiliation No: 130072). Admissions open for academic session 2025–2026. Excellence in academics, laboratories, athletics, and value-based education since 1984.",
+  description: `Official website for Sir C. R. Reddy Public School, Eluru (CBSE Affiliation No: 130072). Admissions open for academic session ${SCHOOL_INFO.admissions.currentAcademicSession}. Excellence in academics, practical science, sports, and value-based education since 1984.`,
   keywords: [
     "Sir C R Reddy Public School",
     "CBSE School Eluru",
@@ -27,20 +18,25 @@ export const metadata: Metadata = {
   authors: [{ name: "Sir C. R. Reddy Educational Institutions Governing Body" }],
   openGraph: {
     title: "Sir C. R. Reddy Public School, CBSE, Eluru",
-    description:
-      "CBSE Affiliated Senior Secondary School (No. 130072). Admissions open for 2025–2026. Quality Service & Value Based Education.",
+    description: `CBSE Affiliated Senior Secondary School (No. 130072). Admissions open for ${SCHOOL_INFO.admissions.currentAcademicSession}. Quality Service & Value Based Education.`,
     url: "https://sircrrschool.ac.in",
     siteName: "Sir C. R. Reddy Public School",
     images: [
       {
-        url: "/images/campus-main.svg",
+        url: "/images/school/campus/campus-aerial-panorama.jpg",
         width: 1200,
-        height: 800,
-        alt: "Sir C. R. Reddy Public School Campus",
+        height: 665,
+        alt: "Sir C. R. Reddy Public School Campus Aerial View",
       },
     ],
     locale: "en_IN",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sir C. R. Reddy Public School | CBSE Senior Secondary, Eluru",
+    description: `CBSE Affiliated Senior Secondary School (No. 130072). Admissions open for ${SCHOOL_INFO.admissions.currentAcademicSession}. Quality Service & Value Based Education.`,
+    images: ["/images/school/campus/campus-aerial-panorama.jpg"],
   },
   robots: {
     index: true,
@@ -61,7 +57,7 @@ export default function RootLayout({
     description:
       "Central Board of Secondary Education (CBSE) affiliated Senior Secondary School in Eluru, Andhra Pradesh.",
     url: "https://sircrrschool.ac.in",
-    logo: "https://sircrrschool.ac.in/images/logo.svg",
+    logo: "https://sircrrschool.ac.in/images/schoollogo.png",
     telephone: SCHOOL_INFO.contact.phoneOffice,
     email: SCHOOL_INFO.contact.emailOfficial,
     address: {
@@ -76,15 +72,15 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={jakartaSans.variable}>
+    <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
+        <link rel="icon" href="/images/schoollogo.png" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#051020] text-slate-100 antialiased selection:bg-[#d4af37] selection:text-[#07172f]">
+      <body className="min-h-screen flex flex-col bg-[#FFFFFF] text-[#2F4156] antialiased selection:bg-[#567C8D] selection:text-white">
         {children}
       </body>
     </html>

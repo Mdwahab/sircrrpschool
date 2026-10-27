@@ -47,19 +47,41 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Send notification email to school admissions desk
-    const emailResult = await sendAdmissionEnquiryNotification(enquiry);
+    let emailResult: { success: boolean; simulated?: boolean; error?: string } = {
+      success: false,
+      simulated: false,
+      error: undefined,
+    };
+    try {
+      emailResult = await sendAdmissionEnquiryNotification(enquiry);
+    } catch (emailErr) {
+      console.error("[ENQUIRY API] Email dispatch exception:", emailErr);
+      emailResult = {
+        success: false,
+        simulated: false,
+        error: emailErr instanceof Error ? emailErr.message : "Notification dispatch failed",
+      };
+    }
 
-    // 6. Return secure confirmation response (Do NOT return database internals or other submissions)
+    const emailStatus = emailResult.simulated
+      ? "simulated"
+      : emailResult.success
+      ? "sent"
+      : "failed";
+
+    // 6. Return secure confirmation response (Do NOT return database secrets or internals)
     return NextResponse.json(
       {
         success: true,
         enquiryId: enquiry.id,
         studentName: enquiry.student_name,
+        gradeApplying: enquiry.grade_applying,
         academicYear: enquiry.academic_year,
-        emailNotified: emailResult.success,
-        isSimulated: emailResult.simulated ?? false,
+        isPersistedInSupabase: enquiry.isPersistedInSupabase,
+        emailStatus,
+        emailError: emailResult.error,
         message:
-          "Admission enquiry successfully submitted. The admissions office has been notified and will contact you shortly.",
+          "Admission enquiry successfully recorded in school admissions records.",
       },
       { status: 201 }
     );

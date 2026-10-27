@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sir C.R. Reddy Public School - Categorized Photo Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --navy: #102A43;
+      --navy-light: #1E3A5F;
+      --blue: #2563EB;
+      --blue-hover: #1D4ED8;
+      --slate-dark: #334155;
+      --slate-muted: #64748B;
+      --border: #E2E8F0;
+      --border-dark: #CBD5E1;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg-canvas);
+      color: var(--navy);
+      padding-bottom: 60px;
+      line-height: 1.5;
+    }
+
+    header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(16, 42, 67, 0.04);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-title h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title p {
+      font-size: 13px;
+      color: var(--slate-muted);
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #EFF6FF;
+      color: var(--blue);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid #BFDBFE;
+    }
+
+    .filter-bar {
+      max-width: 1400px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-dark);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--blue);
+      color: #FFFFFF;
+      border-color: var(--blue);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 24px auto 0;
+      padding: 0 24px;
+    }
+
+    .category-block {
+      margin-bottom: 48px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 2px 6px rgba(16, 42, 67, 0.02);
+    }
+
+    .category-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 14px;
+    }
+
+    .category-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .category-pill {
+      background: var(--navy);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .category-title-wrap h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .category-desc {
+      font-size: 13px;
+      color: var(--slate-muted);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 20px;
+    }
+
+    .photo-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 4px rgba(16, 42, 67, 0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 42, 67, 0.08);
+      border-color: var(--blue);
+    }
+
+    .img-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: #F1F5F9;
+      overflow: hidden;
+    }
+
+    .img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .file-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(16, 42, 67, 0.85);
+      backdrop-filter: blur(4px);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .photo-info {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .photo-info h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .photo-info .desc {
+      font-size: 12px;
+      color: var(--slate-muted);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .badge-review {
+      background: #F1F5F9;
+      border-left: 3px solid #2563EB;
+      color: var(--navy);
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+
+    .meta-row {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .path-code {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--blue);
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand-title">
+        <h1>Sir C. R. Reddy Public School &bull; Photo Categorization Archive</h1>
+        <p>55 Authenticated Photographs Organized into 12 Dedicated Directory Categories</p>
+      </div>
+      <div class="stat-badge">
+        <span>55 Photos Total &bull; 0 Broken &bull; 100% Verified</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCat('all')">All Categories (55)</button>
+    <button class="filter-btn" onclick="filterCat('campus')">campus (4)</button>
+    <button class="filter-btn" onclick="filterCat('classrooms')">classrooms (4)</button>
+    <button class="filter-btn" onclick="filterCat('library')">library (2)</button>
+    <button class="filter-btn" onclick="filterCat('laboratories')">laboratories (4)</button>
+    <button class="filter-btn" onclick="filterCat('sports')">sports (10)</button>
+    <button class="filter-btn" onclick="filterCat('events')">events (4)</button>
+    <button class="filter-btn" onclick="filterCat('celebrations')">celebrations (11)</button>
+    <button class="filter-btn" onclick="filterCat('facilities')">facilities (2)</button>
+    <button class="filter-btn" onclick="filterCat('students-and-activities')">students and activities (10)</button>
+    <button class="filter-btn" onclick="filterCat('staff-and-principal')">staff and principal (2)</button>
+    <button class="filter-btn" onclick="filterCat('gallery')">gallery (1)</button>
+    <button class="filter-btn" onclick="filterCat('review-needed')">review needed (1)</button>
+  </div>
+
+  <main>
+    
+    <section id="campus" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">CAMPUS</span>
+          <h2>CAMPUS (4 Photos)</h2>
+        </div>
+        <p class="category-desc">School building, entrance, exterior, and campus grounds</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="campus">
+        <div class="img-wrapper">
+          <img src="/images/school/campus/campus-aerial-panorama.jpg" alt="Campus Aerial Panorama & Grounds" loading="lazy" />
+          <span class="file-tag">campus-aerial-panorama.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Campus Aerial Panorama & Grounds</h3>
+          <p class="desc">High-resolution drone panorama of the Sir C.R. Reddy Public School campus and surrounding grounds.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/campus/campus-aerial-panorama.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="campus">
+        <div class="img-wrapper">
+          <img src="/images/school/campus/main-academic-building-elevation.jpg" alt="Main Academic Complex Elevation" loading="lazy" />
+          <span class="file-tag">main-academic-building-elevation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Main Academic Complex Elevation</h3>
+          <p class="desc">Front exterior architectural view of the multi-storey academic school building.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/campus/main-academic-building-elevation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="campus">
+        <div class="img-wrapper">
+          <img src="/images/school/campus/gate-2-campus-entrance.jpg" alt="Gate 2 Entrance & CBSE Board" loading="lazy" />
+          <span class="file-tag">gate-2-campus-entrance.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Gate 2 Entrance & CBSE Board</h3>
+          <p class="desc">School Gate 2 main entrance featuring official CBSE affiliation details and landscaped perimeter.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/campus/gate-2-campus-entrance.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="campus">
+        <div class="img-wrapper">
+          <img src="/images/school/campus/campus-assembly-quadrangle-overview.jpg" alt="School Assembly Quadrangle Overview" loading="lazy" />
+          <span class="file-tag">campus-assembly-quadrangle-overview.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>School Assembly Quadrangle Overview</h3>
+          <p class="desc">Elevated campus panorama showing the central quadrangle and open grounds.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/campus/campus-assembly-quadrangle-overview.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="classrooms" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">CLASSROOMS</span>
+          <h2>CLASSROOMS (4 Photos)</h2>
+        </div>
+        <p class="category-desc">Classroom interiors and teaching spaces</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="classrooms">
+        <div class="img-wrapper">
+          <img src="/images/school/classrooms/physics-interactive-classroom.jpg" alt="Secondary Physics Class & Interactive Display" loading="lazy" />
+          <span class="file-tag">physics-interactive-classroom.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Secondary Physics Class & Interactive Display</h3>
+          <p class="desc">Interactive secondary physics classroom with Rutherford atomic scattering diagrams and student seating.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/classrooms/physics-interactive-classroom.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="classrooms">
+        <div class="img-wrapper">
+          <img src="/images/school/classrooms/smart-digital-classroom.jpg" alt="Smart Interactive Digital Classroom" loading="lazy" />
+          <span class="file-tag">smart-digital-classroom.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Smart Interactive Digital Classroom</h3>
+          <p class="desc">Air-conditioned smart classroom equipped with touch-interactive digital panel and modern seating.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/classrooms/smart-digital-classroom.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="classrooms">
+        <div class="img-wrapper">
+          <img src="/images/school/classrooms/interactive-smart-board-classroom.jpg" alt="Smart Digital Classroom Broadcast" loading="lazy" />
+          <span class="file-tag">interactive-smart-board-classroom.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Smart Digital Classroom Broadcast</h3>
+          <p class="desc">Digital classroom featuring large smart LED screen for multimedia teaching and video lessons.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/classrooms/interactive-smart-board-classroom.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="classrooms">
+        <div class="img-wrapper">
+          <img src="/images/school/classrooms/audiovisual-projection-hall.jpg" alt="Audiovisual Media & Projection Hall" loading="lazy" />
+          <span class="file-tag">audiovisual-projection-hall.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Audiovisual Media & Projection Hall</h3>
+          <p class="desc">Modern audio-visual projection classroom for interactive multimedia presentations.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/classrooms/audiovisual-projection-hall.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="library" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">LIBRARY</span>
+          <h2>LIBRARY (2 Photos)</h2>
+        </div>
+        <p class="category-desc">Library, bookshelves, reading halls, and reference stacks</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="library">
+        <div class="img-wrapper">
+          <img src="/images/school/library/school-library-reading-hall.jpg" alt="School Library & Reference Reading Hall" loading="lazy" />
+          <span class="file-tag">school-library-reading-hall.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>School Library & Reference Reading Hall</h3>
+          <p class="desc">Spacious school library reading hall featuring book stacks, periodicals, and study tables.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/library/school-library-reading-hall.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="library">
+        <div class="img-wrapper">
+          <img src="/images/school/library/library-research-study-bay.jpg" alt="Library Academic Research & Study Bay" loading="lazy" />
+          <span class="file-tag">library-research-study-bay.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Library Academic Research & Study Bay</h3>
+          <p class="desc">Dedicated reference stacks and research study bays with encyclopedias and academic journals.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/library/library-research-study-bay.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="laboratories" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">LABORATORIES</span>
+          <h2>LABORATORIES (4 Photos)</h2>
+        </div>
+        <p class="category-desc">Science, computer, physics, and chemistry laboratories</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="laboratories">
+        <div class="img-wrapper">
+          <img src="/images/school/laboratories/computer-technology-lab.jpg" alt="Computer & Information Technology Lab" loading="lazy" />
+          <span class="file-tag">computer-technology-lab.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Computer & Information Technology Lab</h3>
+          <p class="desc">Air-conditioned ICT lab with individual networked desktop workstations and broadband connectivity.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/laboratories/computer-technology-lab.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="laboratories">
+        <div class="img-wrapper">
+          <img src="/images/school/laboratories/chemistry-titration-practical-lab.jpg" alt="Senior Chemistry Practical Titration" loading="lazy" />
+          <span class="file-tag">chemistry-titration-practical-lab.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Senior Chemistry Practical Titration</h3>
+          <p class="desc">Fully equipped senior chemistry laboratory featuring titration stands, burettes, and chemical reagents.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/laboratories/chemistry-titration-practical-lab.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="laboratories">
+        <div class="img-wrapper">
+          <img src="/images/school/laboratories/annual-science-fair-exhibition.jpg" alt="Annual Science Fair & Working Models" loading="lazy" />
+          <span class="file-tag">annual-science-fair-exhibition.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Annual Science Fair & Working Models</h3>
+          <p class="desc">Students presenting working scientific models, renewable energy exhibits, and biology projects.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/laboratories/annual-science-fair-exhibition.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="laboratories">
+        <div class="img-wrapper">
+          <img src="/images/school/laboratories/science-laboratory-apparatus.jpg" alt="Science Practical Apparatus Demonstration" loading="lazy" />
+          <span class="file-tag">science-laboratory-apparatus.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Science Practical Apparatus Demonstration</h3>
+          <p class="desc">Laboratory demonstration counter with optical lenses, glassware, and scientific measuring instruments.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/laboratories/science-laboratory-apparatus.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="sports" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">SPORTS</span>
+          <h2>SPORTS (10 Photos)</h2>
+        </div>
+        <p class="category-desc">Playgrounds, sports facilities, tournament matches, and trophies</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/school-sports-ground-and-track.jpg" alt="Athletics Field & Sports Playgrounds" loading="lazy" />
+          <span class="file-tag">school-sports-ground-and-track.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Athletics Field & Sports Playgrounds</h3>
+          <p class="desc">Expansive outdoor athletic field with running tracks, cricket pitch, and sports courts.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/school-sports-ground-and-track.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/inter-school-table-tennis-tournament.jpg" alt="Inter-School Table Tennis Tournament Match" loading="lazy" />
+          <span class="file-tag">inter-school-table-tennis-tournament.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Inter-School Table Tennis Tournament Match</h3>
+          <p class="desc">Inter-school table tennis tournament match in progress with umpire scoring and spectators.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/inter-school-table-tennis-tournament.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/table-tennis-tournament-singles-match.jpg" alt="Table Tennis Championship Tournament Action" loading="lazy" />
+          <span class="file-tag">table-tennis-tournament-singles-match.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Table Tennis Championship Tournament Action</h3>
+          <p class="desc">Competitive singles match play during the CBSE Cluster VII Table Tennis Championship.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/table-tennis-tournament-singles-match.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/table-tennis-tournament-doubles-rally.jpg" alt="Table Tennis Doubles Competitive Rally" loading="lazy" />
+          <span class="file-tag">table-tennis-tournament-doubles-rally.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Table Tennis Doubles Competitive Rally</h3>
+          <p class="desc">Doubles match action during the regional CBSE sports competition.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/table-tennis-tournament-doubles-rally.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/cbse-table-tennis-match-play.jpg" alt="CBSE Cluster VII Tournament Match Play" loading="lazy" />
+          <span class="file-tag">cbse-table-tennis-match-play.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>CBSE Cluster VII Tournament Match Play</h3>
+          <p class="desc">Intense rally during official tournament play under certified sports arbiters.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/cbse-table-tennis-match-play.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/indoor-table-tennis-sports-hall.jpg" alt="Indoor Sports Complex Table Tennis Rally" loading="lazy" />
+          <span class="file-tag">indoor-table-tennis-sports-hall.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Indoor Sports Complex Table Tennis Rally</h3>
+          <p class="desc">Indoor sports complex facility hosting championship sports meets.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/indoor-table-tennis-sports-hall.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/cbse-cluster-championship-trophies.jpg" alt="CBSE Cluster VII Championship Trophies" loading="lazy" />
+          <span class="file-tag">cbse-cluster-championship-trophies.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>CBSE Cluster VII Championship Trophies</h3>
+          <p class="desc">Trophy showcase and official medals won by school teams at the CBSE Cluster VII meet.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/cbse-cluster-championship-trophies.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/u14-girls-table-tennis-champions.jpg" alt="CBSE Cluster VII Under-14 Girls Champions" loading="lazy" />
+          <span class="file-tag">u14-girls-table-tennis-champions.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>CBSE Cluster VII Under-14 Girls Champions</h3>
+          <p class="desc">Sir C.R. Reddy Public School Under-14 Girls squad holding winner trophies and certificates.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/u14-girls-table-tennis-champions.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/sports-gold-medal-award-ceremony.jpg" alt="Tournament Gold Medal & Certificate Award" loading="lazy" />
+          <span class="file-tag">sports-gold-medal-award-ceremony.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Tournament Gold Medal & Certificate Award</h3>
+          <p class="desc">Gold medal and citation presentation to triumphant student athlete on the victory podium.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/sports-gold-medal-award-ceremony.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="sports">
+        <div class="img-wrapper">
+          <img src="/images/school/sports/sports-championship-felicitation.jpg" alt="Championship Trophy Felicitation Ceremony" loading="lazy" />
+          <span class="file-tag">sports-championship-felicitation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Championship Trophy Felicitation Ceremony</h3>
+          <p class="desc">Felicitation ceremony recognizing championship-winning student athletes.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/sports/sports-championship-felicitation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="events" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">EVENTS</span>
+          <h2>EVENTS (4 Photos)</h2>
+        </div>
+        <p class="category-desc">School functions, competitions, exhibitions, and civic activities</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="events">
+        <div class="img-wrapper">
+          <img src="/images/school/events/aahlad-cultural-lamp-lighting.jpg" alt="Aahlad Cultural Fiesta Prayer Invocation" loading="lazy" />
+          <span class="file-tag">aahlad-cultural-lamp-lighting.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Aahlad Cultural Fiesta Prayer Invocation</h3>
+          <p class="desc">Dignitaries and faculty lighting the ceremonial brass lamp to inaugurate Aahlad cultural festival.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/events/aahlad-cultural-lamp-lighting.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="events">
+        <div class="img-wrapper">
+          <img src="/images/school/events/inaugural-choir-performance.jpg" alt="Student Vocal Choir & Inauguration Ceremony" loading="lazy" />
+          <span class="file-tag">inaugural-choir-performance.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Student Vocal Choir & Inauguration Ceremony</h3>
+          <p class="desc">Student vocal choir opening the annual cultural festival with devotional songs.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/events/inaugural-choir-performance.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="events">
+        <div class="img-wrapper">
+          <img src="/images/school/events/cultural-fiesta-stage-proceedings.jpg" alt="School Cultural Fiesta Stage Proceedings" loading="lazy" />
+          <span class="file-tag">cultural-fiesta-stage-proceedings.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>School Cultural Fiesta Stage Proceedings</h3>
+          <p class="desc">Cultural evening stage presentations and celebrations attended by parents and alumni.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/events/cultural-fiesta-stage-proceedings.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="events">
+        <div class="img-wrapper">
+          <img src="/images/school/events/national-unity-day-ncc-rally.jpg" alt="National Unity Day Rally & NCC Cadets Formation" loading="lazy" />
+          <span class="file-tag">national-unity-day-ncc-rally.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>National Unity Day Rally & NCC Cadets Formation</h3>
+          <p class="desc">NCC cadet corps leading the National Unity Day community run in Eluru.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/events/national-unity-day-ncc-rally.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="celebrations" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">CELEBRATIONS</span>
+          <h2>CELEBRATIONS (11 Photos)</h2>
+        </div>
+        <p class="category-desc">Annual days, graduation ceremonies, festivals, and cultural performances</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/graduation-day-welcome-dance.jpg" alt="Graduation Day Classical Welcome Dance" loading="lazy" />
+          <span class="file-tag">graduation-day-welcome-dance.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Graduation Day Classical Welcome Dance</h3>
+          <p class="desc">Inaugural classical invocation dance presented by senior students at Graduation Day.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/graduation-day-welcome-dance.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/kuchipudi-classical-dance-duo.jpg" alt="Kuchipudi Stage Performance Duo" loading="lazy" />
+          <span class="file-tag">kuchipudi-classical-dance-duo.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Kuchipudi Stage Performance Duo</h3>
+          <p class="desc">Kuchipudi classical dance duo performing on the ceremonial stage.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/kuchipudi-classical-dance-duo.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/graduation-cultural-choreography.jpg" alt="Graduation Ceremony Cultural Choreography" loading="lazy" />
+          <span class="file-tag">graduation-cultural-choreography.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Graduation Ceremony Cultural Choreography</h3>
+          <p class="desc">Ensemble classical choreography celebrating graduation festivities.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/graduation-cultural-choreography.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/classical-temple-dance-solo.jpg" alt="Classical Temple Dance Soloist" loading="lazy" />
+          <span class="file-tag">classical-temple-dance-solo.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Classical Temple Dance Soloist</h3>
+          <p class="desc">Solo classical performance celebrating the heritage and traditions of the institution.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/classical-temple-dance-solo.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/primary-student-stage-recitation.jpg" alt="Primary School Student Stage Recitation" loading="lazy" />
+          <span class="file-tag">primary-student-stage-recitation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Primary School Student Stage Recitation</h3>
+          <p class="desc">Primary school student delivering stage recitation at the graduation ceremony.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/primary-student-stage-recitation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/kindergarten-graduation-robes.jpg" alt="Kindergarten Graduation Ceremony (Cap & Gown)" loading="lazy" />
+          <span class="file-tag">kindergarten-graduation-robes.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Kindergarten Graduation Ceremony (Cap & Gown)</h3>
+          <p class="desc">Kindergarten graduates in black and royal-blue gowns and mortarboards receiving awards.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/kindergarten-graduation-robes.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/graduation-certificate-presentation.jpg" alt="Annual Graduation Scroll & Certificate Presentation" loading="lazy" />
+          <span class="file-tag">graduation-certificate-presentation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Annual Graduation Scroll & Certificate Presentation</h3>
+          <p class="desc">Presentation of graduation scrolls and merit citations by institutional dignitaries.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/graduation-certificate-presentation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/ukg-graduate-felicitation.jpg" alt="UKG Graduate Felicitation on Stage" loading="lazy" />
+          <span class="file-tag">ukg-graduate-felicitation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>UKG Graduate Felicitation on Stage</h3>
+          <p class="desc">UKG student recognized on stage during the annual graduation celebrations.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/ukg-graduate-felicitation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/kindergarten-graduating-cohort.jpg" alt="Kindergarten Graduating Cohort & Faculty" loading="lazy" />
+          <span class="file-tag">kindergarten-graduating-cohort.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Kindergarten Graduating Cohort & Faculty</h3>
+          <p class="desc">Graduating kindergarten cohort with faculty mentors and teachers on stage.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/kindergarten-graduating-cohort.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/sahasragalarchana-dance-troupe.jpg" alt="Sahasragalarchana Classical Dance Troupe" loading="lazy" />
+          <span class="file-tag">sahasragalarchana-dance-troupe.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Sahasragalarchana Classical Dance Troupe</h3>
+          <p class="desc">Grand classical dance troupe performing in traditional yellow and red attire at Sahasragalarchana.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/sahasragalarchana-dance-troupe.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="celebrations">
+        <div class="img-wrapper">
+          <img src="/images/school/celebrations/celebration-musical-choir.jpg" alt="Graduation Day Musical Choral Presentation" loading="lazy" />
+          <span class="file-tag">celebration-musical-choir.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Graduation Day Musical Choral Presentation</h3>
+          <p class="desc">Student choir singing harmonic celebratory hymns during Graduation Day.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/celebrations/celebration-musical-choir.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="facilities" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">FACILITIES</span>
+          <h2>FACILITIES (2 Photos)</h2>
+        </div>
+        <p class="category-desc">Auditorium, cultural stages, and transport fleet buses</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="facilities">
+        <div class="img-wrapper">
+          <img src="/images/school/facilities/school-transport-bus-fleet.jpg" alt="Campus Transport Service Fleet" loading="lazy" />
+          <span class="file-tag">school-transport-bus-fleet.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Campus Transport Service Fleet</h3>
+          <p class="desc">Fleet of dedicated yellow Tata Marcopolo school buses providing secure transit across Eluru.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/facilities/school-transport-bus-fleet.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="facilities">
+        <div class="img-wrapper">
+          <img src="/images/school/facilities/kanchanamala-kalavedika-stage.jpg" alt="Dr. K. Kanchanamala Kalavedika Cultural Stage" loading="lazy" />
+          <span class="file-tag">kanchanamala-kalavedika-stage.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Dr. K. Kanchanamala Kalavedika Cultural Stage</h3>
+          <p class="desc">Permanent outdoor stage and auditorium facility for cultural programs and gatherings.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/facilities/kanchanamala-kalavedika-stage.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="students-and-activities" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">STUDENTS-AND-ACTIVITIES</span>
+          <h2>STUDENTS AND ACTIVITIES (10 Photos)</h2>
+        </div>
+        <p class="category-desc">Morning assembly, student pledge, yoga, and botanical fieldwork</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/morning-assembly-pledge.jpg" alt="National Pledge Recitation at Morning Assembly" loading="lazy" />
+          <span class="file-tag">morning-assembly-pledge.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>National Pledge Recitation at Morning Assembly</h3>
+          <p class="desc">Students standing at attention taking the National Pledge during morning assembly.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/morning-assembly-pledge.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/assembly-student-speech.jpg" alt="Student Assembly Address & Thematic Speech" loading="lazy" />
+          <span class="file-tag">assembly-student-speech.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Student Assembly Address & Thematic Speech</h3>
+          <p class="desc">Student delivering an inspirational thematic morning speech at the podium microphone.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/assembly-student-speech.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/assembly-thought-for-the-day.jpg" alt="Daily Thought for the Day & Student Reading" loading="lazy" />
+          <span class="file-tag">assembly-thought-for-the-day.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Daily Thought for the Day & Student Reading</h3>
+          <p class="desc">Student sharing the daily moral thought and news updates with the student assembly.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/assembly-thought-for-the-day.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/assembly-student-anchoring.jpg" alt="Morning Assembly Anchoring & Student Leadership" loading="lazy" />
+          <span class="file-tag">assembly-student-anchoring.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Morning Assembly Anchoring & Student Leadership</h3>
+          <p class="desc">Student leader anchoring the morning assembly proceedings.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/assembly-student-anchoring.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/assembly-student-presentation.jpg" alt="Assembly Presentation by Student Council" loading="lazy" />
+          <span class="file-tag">assembly-student-presentation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Assembly Presentation by Student Council</h3>
+          <p class="desc">Student Council members coordinating and presenting assembly programs.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/assembly-student-presentation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/whole-school-assembly-formation.jpg" alt="Whole-School Morning Assembly Gathering" loading="lazy" />
+          <span class="file-tag">whole-school-assembly-formation.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Whole-School Morning Assembly Gathering</h3>
+          <p class="desc">Disciplined student columns assembled across the campus quadrangle.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/whole-school-assembly-formation.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/mass-student-yoga-session.jpg" alt="Mass Yoga Session in School Auditorium" loading="lazy" />
+          <span class="file-tag">mass-student-yoga-session.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Mass Yoga Session in School Auditorium</h3>
+          <p class="desc">Students practicing mindfulness, breathing, and physical wellness during yoga session.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/mass-student-yoga-session.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/guided-yoga-asana-practice.jpg" alt="Yoga Asana & Pranayama Guided Practice" loading="lazy" />
+          <span class="file-tag">guided-yoga-asana-practice.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Yoga Asana & Pranayama Guided Practice</h3>
+          <p class="desc">Instructor-guided yoga asana demonstrations promoting student focus and wellbeing.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/guided-yoga-asana-practice.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/botany-field-study-herb-identification.jpg" alt="Botany Field Study & Medicinal Plant Identification" loading="lazy" />
+          <span class="file-tag">botany-field-study-herb-identification.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Botany Field Study & Medicinal Plant Identification</h3>
+          <p class="desc">Students participating in hands-on botanical fieldwork identifying therapeutic flora.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/botany-field-study-herb-identification.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="students-and-activities">
+        <div class="img-wrapper">
+          <img src="/images/school/students-and-activities/herbal-flora-cultivation-beds.jpg" alt="Herbal Flora Cultivation & Study Beds" loading="lazy" />
+          <span class="file-tag">herbal-flora-cultivation-beds.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Herbal Flora Cultivation & Study Beds</h3>
+          <p class="desc">Dedicated botanical cultivation plots and labeled nursery beds for environmental science.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/students-and-activities/herbal-flora-cultivation-beds.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="staff-and-principal" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">STAFF-AND-PRINCIPAL</span>
+          <h2>STAFF AND PRINCIPAL (2 Photos)</h2>
+        </div>
+        <p class="category-desc">School Principal and faculty leadership photographs</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="staff-and-principal">
+        <div class="img-wrapper">
+          <img src="/images/school/staff-and-principal/principal-morning-assembly-address.jpg" alt="Principal's Morning Address at Kalavedika Stage" loading="lazy" />
+          <span class="file-tag">principal-morning-assembly-address.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Principal's Morning Address at Kalavedika Stage</h3>
+          <p class="desc">School Principal and faculty members addressing the student body from the dais.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/staff-and-principal/principal-morning-assembly-address.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      <div class="photo-card" data-category="staff-and-principal">
+        <div class="img-wrapper">
+          <img src="/images/school/staff-and-principal/faculty-supervising-assembly.jpg" alt="Assembly Gathering & Faculty Supervision" loading="lazy" />
+          <span class="file-tag">faculty-supervising-assembly.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Assembly Gathering & Faculty Supervision</h3>
+          <p class="desc">School faculty and teachers guiding and supervising morning student assembly lines.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/staff-and-principal/faculty-supervising-assembly.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="gallery" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">GALLERY</span>
+          <h2>GALLERY (1 Photo)</h2>
+        </div>
+        <p class="category-desc">General institutional photographs and landscape entries</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="gallery">
+        <div class="img-wrapper">
+          <img src="/images/school/gallery/medicinal-plants-garden-entrance.jpg" alt="Medicinal Plants Garden Excursion Entrance" loading="lazy" />
+          <span class="file-tag">medicinal-plants-garden-entrance.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Medicinal Plants Garden Excursion Entrance</h3>
+          <p class="desc">Entrance gate and archway to the institutional medicinal plants garden and botanical sanctuary.</p>
+          
+          <div class="meta-row">
+            <span class="path-code">/images/school/gallery/medicinal-plants-garden-entrance.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+    <section id="review-needed" class="category-block">
+      <div class="category-header">
+        <div class="category-title-wrap">
+          <span class="category-pill">REVIEW-NEEDED</span>
+          <h2>REVIEW NEEDED (1 Photo)</h2>
+        </div>
+        <p class="category-desc">Photographs whose primary category has dual context or requires admin review</p>
+      </div>
+
+      <div class="photo-grid">
+  
+      <div class="photo-card" data-category="review-needed">
+        <div class="img-wrapper">
+          <img src="/images/school/review-needed/campus-ground-perimeter-boundary.jpg" alt="Campus Athletic Field Perimeter Boundary" loading="lazy" />
+          <span class="file-tag">campus-ground-perimeter-boundary.jpg</span>
+        </div>
+        <div class="photo-info">
+          <h3>Campus Athletic Field Perimeter Boundary</h3>
+          <p class="desc">Wide boundary perimeter photograph showing outer fence and tree line adjoining the athletic field. Placed in review-needed due to dual context (sports grounds vs campus boundary perimeter).</p>
+          <div class="badge-review">Review: Photograph captures the outer boundary fence and perimeter tree line of the playground. Could be classified under sports/ (as field perimeter) or campus/ (as campus grounds/perimeter). Placed here to prevent inaccurate guessing.</div>
+          <div class="meta-row">
+            <span class="path-code">/images/school/review-needed/campus-ground-perimeter-boundary.jpg</span>
+          </div>
+        </div>
+      </div>
+    
+      </div>
+    </section>
+  
+  </main>
+
+  <script>
+    function filterCat(cat) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.querySelectorAll('.category-block').forEach(block => {
+        if (cat === 'all' || block.id === cat) {
+          block.style.display = 'block';
+        } else {
+          block.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

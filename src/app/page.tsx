@@ -10,38 +10,50 @@ import { ResultsSection } from "@/components/sections/ResultsSection";
 import { NoticesSection } from "@/components/sections/NoticesSection";
 import { AdmissionsSection } from "@/components/sections/AdmissionsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
+import { CinematicSectionDivider } from "@/components/ui/ScrollAnimation";
 import {
   getPublishedGalleryImages,
   getPublishedAchievements,
   getPublishedNotices,
+  getSchoolSettings,
 } from "@/lib/db/service";
 
-
+// Ensure real-time live data sync: Never serve stale build-time cached HTML
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
-  const [galleryImages, achievements, notices] = await Promise.all([
+  const [galleryImages, achievements, notices, settings] = await Promise.all([
     getPublishedGalleryImages(),
     getPublishedAchievements(),
     getPublishedNotices(),
+    getSchoolSettings(),
   ]);
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Navbar settings={settings} />
 
       <main className="flex-grow">
-        <HeroSection />
+        <HeroSection settings={settings} />
         <AboutSection />
+        <CinematicSectionDivider fromColor="#F5EEEB" toColor="#FFFFFF" />
         <AcademicsSection />
-        <PrincipalSection />
-        <GallerySection initialImages={galleryImages} />
+        <CinematicSectionDivider fromColor="#FFFFFF" toColor="#F5EEEB" />
+        <PrincipalSection settings={settings} />
+        <CinematicSectionDivider fromColor="#F5EEEB" toColor="#FFFFFF" />
         <ResultsSection achievements={achievements} />
+        <CinematicSectionDivider fromColor="#FFFFFF" toColor="#F5EEEB" />
+        <GallerySection initialImages={galleryImages} />
+        <CinematicSectionDivider fromColor="#F5EEEB" toColor="#FFFFFF" />
         <NoticesSection notices={notices} />
-        <AdmissionsSection />
-        <ContactSection />
+        <CinematicSectionDivider fromColor="#FFFFFF" toColor="#F5EEEB" />
+        <AdmissionsSection settings={settings} />
+        <CinematicSectionDivider fromColor="#F5EEEB" toColor="#FFFFFF" />
+        <ContactSection settings={settings} />
       </main>
 
-      <Footer />
+      <Footer settings={settings} />
     </div>
   );
 }

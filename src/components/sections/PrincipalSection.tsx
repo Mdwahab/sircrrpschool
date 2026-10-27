@@ -1,92 +1,112 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { VerificationBadge } from "@/components/ui/VerificationBadge";
-import { Quote } from "lucide-react";
+import { Quote, ShieldCheck, AlertCircle } from "lucide-react";
 import { SCHOOL_INFO } from "@/config/schoolInfo";
+import {
+  ScrollReveal,
+  ScrollStaggerContainer,
+  ScrollStaggerItem,
+  ScrollImageReveal,
+} from "@/components/ui/ScrollAnimation";
 
-export function PrincipalSection() {
+interface PrincipalSectionProps {
+  settings?: Record<string, string>;
+}
+
+export function PrincipalSection({ settings }: PrincipalSectionProps = {}) {
+  const principalName = settings?.principalName || SCHOOL_INFO.principal.namePlaceholder;
+  const principalMessage =
+    settings?.principalMessage ||
+    "At Sir C. R. Reddy Public School, our endeavor is to nurture every child into a confident, disciplined, and enlightened individual capable of navigating modern global challenges while remaining firmly anchored in cultural and moral values.";
+
   return (
-    <section id="principal" className="py-24 bg-[#051020] relative">
+    <section id="principal" className="py-20 sm:py-28 bg-[#F5EEEB] relative scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           badge="LEADERSHIP &amp; DIRECTION"
           title="From the Principal's Desk"
+          highlight="Principal's Desk"
           subtitle="Guiding young minds towards intellectual brilliance, ethical courage, and responsible citizenship."
         />
 
-        <div className="max-w-5xl mx-auto glass-card rounded-2xl p-6 sm:p-10 border border-[#D4AF37]/30 shadow-2xl relative">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Principal Photo Column */}
-            <div className="md:col-span-5 flex flex-col items-center">
-              <div className="relative w-full max-w-[280px] aspect-[4/5] rounded-xl overflow-hidden bg-[#0A1E3C] border-2 border-[#D4AF37]/40 shadow-xl group">
+        <ScrollReveal className="max-w-5xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-[#C8D9E6] shadow-md hover:shadow-xl transition-all duration-300 relative">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10 items-center">
+            {/* Principal Insignia / Portrait Column */}
+            <ScrollImageReveal className="md:col-span-5 flex flex-col items-center text-center" delay={0.1}>
+              <div className="relative w-full max-w-[260px] aspect-[4/5] rounded-2xl overflow-hidden bg-[#F5EEEB] border-2 border-[#C8D9E6] shadow-sm group transition-all duration-300 hover:shadow-lg hover:border-[#567C8D] hover:-translate-y-1">
                 <Image
                   src="/images/principal-placeholder.svg"
-                  alt="Principal, Sir C. R. Reddy Public School Portrait Placeholder"
+                  alt="Office of the Principal Insignia - Sir C. R. Reddy Public School"
                   fill
-                  className="object-cover"
+                  sizes="260px"
+                  className="object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-105"
                 />
               </div>
 
-              <div className="mt-4 text-center">
-                <h3 className="font-serif font-bold text-lg text-white">
-                  {SCHOOL_INFO.principal.namePlaceholder}
+              <div className="mt-4">
+                <h3 suppressHydrationWarning className="font-serif font-bold text-lg text-[#2F4156]">
+                  {principalName}
                 </h3>
-                <p className="text-xs text-[#D4AF37] font-semibold mt-0.5">
-                  Principal, Senior Secondary Wing
+                <p className="text-xs text-[#567C8D] font-semibold mt-0.5">
+                  Office of the Principal, Eluru Campus
                 </p>
-                <div className="mt-2.5">
-                  <VerificationBadge
-                    verified={SCHOOL_INFO.principal.isMessageVerified}
-                    label="Official Address Pending Management Submission"
-                    notes="The formal inaugural message and authorized principal portrait will be published upon approval from the governing committee."
-                  />
+                <div className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold text-[#2F4156] bg-[#F5EEEB] px-3 py-1 rounded-full border border-[#C8D9E6]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#567C8D]" />
+                  <span>CBSE Affiliated Administration</span>
                 </div>
               </div>
-            </div>
+            </ScrollImageReveal>
 
-            {/* Address Column */}
-            <div className="md:col-span-7 space-y-4">
-              <div className="w-10 h-10 rounded-lg bg-[#0E2548] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37]">
-                <Quote className="w-5 h-5" />
-              </div>
-
-              <h4 className="text-xl sm:text-2xl font-serif font-bold text-white leading-snug">
-                Fostering Character, Curiosity, and Compassion
-              </h4>
-
-              <div className="space-y-3 text-slate-300 text-sm sm:text-base leading-relaxed">
-                <p className="italic bg-[#0A1E3C]/40 p-4 rounded-xl border border-slate-700/60 text-slate-200">
-                  &ldquo;At Sir C. R. Reddy Public School, our endeavor is to nurture every child into a confident, disciplined, and enlightened individual capable of navigating modern global challenges while remaining firmly anchored in cultural and moral values.&rdquo;
-                </p>
-
-                <p className="text-xs text-slate-400">
-                  <em>
-                    [Official address text pending final management authorization. The verified inaugural address will be published under the authority of the School Managing Committee, Sir C. R. Reddy Educational Institutions, Eluru.]
-                  </em>
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <span className="text-xs text-[#D4AF37] font-bold block">
-                    Sir C. R. Reddy Public School
-                  </span>
-                  <span className="text-[11px] text-slate-400">
-                    CBSE Affiliated Senior Secondary School • Eluru
-                  </span>
+            {/* Principal Message Column */}
+            <ScrollStaggerContainer className="md:col-span-7 space-y-5">
+              <ScrollStaggerItem>
+                <div className="w-12 h-12 rounded-2xl bg-[#2F4156] flex items-center justify-center text-white shadow-sm">
+                  <Quote className="w-6 h-6 text-[#C8D9E6]" />
                 </div>
+              </ScrollStaggerItem>
 
-                <a
-                  href="#admissions"
-                  className="inline-flex items-center gap-1.5 text-xs text-[#D4AF37] font-bold hover:underline"
-                >
-                  <span>Admission Enquiry &rarr;</span>
-                </a>
-              </div>
-            </div>
+              <ScrollStaggerItem>
+                <h4 className="text-xl sm:text-2xl font-serif font-bold text-[#2F4156] leading-snug">
+                  Nurturing Character, Intellect &amp;{" "}
+                  <span className="bg-gradient-to-r from-[#2F4156] via-[#3E5C6B] to-[#567C8D] bg-clip-text text-transparent font-extrabold">
+                    Global Competence
+                  </span>
+                </h4>
+              </ScrollStaggerItem>
+
+              <ScrollStaggerItem>
+                <div className="space-y-3.5 text-sm sm:text-base text-[#567C8D] leading-relaxed font-normal">
+                  <p className="italic font-serif text-[#2F4156] text-base border-l-2 border-[#567C8D] pl-3 py-1 bg-[#F5EEEB] rounded-r-lg">
+                    &ldquo;{principalMessage}&rdquo;
+                  </p>
+
+                  <p>
+                    We recognize that education extends beyond textbooks. Our faculty members employ interactive learning methodologies that foster critical thinking, collaborative inquiry, and a lifelong thirst for knowledge.
+                  </p>
+
+                  <p>
+                    With dedicated laboratory infrastructure, sports grounds, and a disciplined academic atmosphere, we prepare our scholars for academic and personal growth.
+                  </p>
+                </div>
+              </ScrollStaggerItem>
+
+              {/* Explicit Verification Note */}
+              {!SCHOOL_INFO.principal.isPhotoVerified && (
+                <ScrollStaggerItem>
+                  <div className="pt-2">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#F5EEEB] border border-[#C8D9E6] text-xs text-[#2F4156]">
+                      <AlertCircle className="w-4 h-4 text-[#567C8D] shrink-0" />
+                      <span>Official photographic portrait and signed message awaiting final school management confirmation.</span>
+                    </div>
+                  </div>
+                </ScrollStaggerItem>
+              )}
+            </ScrollStaggerContainer>
           </div>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

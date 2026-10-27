@@ -18,7 +18,7 @@ export default async function AdminDashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[#051020] text-slate-100">
+    <div className="flex min-h-screen bg-[#FAF8F5] text-slate-900">
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <AdminHeader user={user} />

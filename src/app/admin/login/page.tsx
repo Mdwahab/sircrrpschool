@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, ArrowRight, AlertCircle, Loader2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
+import { PREMIUM_EASE } from "@/components/ui/ScrollAnimation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -53,41 +55,47 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#07172F] via-[#091E3D] to-[#040C18] flex flex-col justify-center items-center px-4 py-12">
-      <div className="max-w-md w-full glass-card rounded-2xl p-8 border border-[#D4AF37]/35 shadow-2xl relative">
+    <div className="min-h-screen bg-[#F5EEEB] flex flex-col justify-center items-center px-4 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: PREMIUM_EASE }}
+        className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#C8D9E6] shadow-xl relative"
+      >
         {/* Crest & Title */}
         <div className="text-center mb-8">
-          <div className="relative w-16 h-16 mx-auto mb-3">
+          <div className="relative w-16 h-16 mx-auto mb-3 rounded-full border-2 border-[#C8D9E6] shadow-sm overflow-hidden bg-white">
             <Image
-              src="/images/logo.svg"
+              src="/images/schoollogo.png"
               alt="Sir C. R. Reddy School Crest"
               fill
+              sizes="64px"
               priority
-              className="object-contain"
+              className="object-cover"
             />
           </div>
-          <h1 className="text-xl sm:text-2xl font-serif font-bold text-white">
+          <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#2F4156]">
             Administrator Portal
           </h1>
-          <p className="text-xs text-[#D4AF37] font-semibold mt-1">
-            Sir C. R. Reddy Public School • Eluru
+          <p className="text-xs text-[#567C8D] font-bold mt-1">
+            Sir C. R. Reddy Public School, Eluru
           </p>
-          <div className="mt-2 inline-flex items-center gap-1 text-[11px] text-slate-400">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C8D9E6]/30 border border-[#C8D9E6] text-[11px] text-[#2F4156] font-bold">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#567C8D]" />
             <span>Authorized Management Access Only</span>
           </div>
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-3.5 rounded-lg bg-red-950/80 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
-            <span>{errorMsg}</span>
+          <div className="mb-6 p-3.5 rounded-xl bg-[#F5EEEB] border border-[#567C8D]/40 text-[#2F4156] text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#567C8D]" />
+            <span className="font-bold">{errorMsg}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
               Administrator Email
             </label>
             <div className="relative">
@@ -97,14 +105,14 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@sircrrschool.ac.in"
                 required
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white placeholder-slate-500 text-sm focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#F5EEEB]/30 border border-[#C8D9E6] text-[#2F4156] placeholder-[#2F4156]/40 text-sm focus:bg-white focus:border-[#567C8D] focus:ring-2 focus:ring-[#C8D9E6] transition-all outline-none font-medium"
               />
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Mail className="w-4 h-4 text-[#567C8D] absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
               Secure Password
             </label>
             <div className="relative">
@@ -112,11 +120,11 @@ export default function AdminLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
+                placeholder="Enter password"
                 required
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white placeholder-slate-500 text-sm focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] transition-all"
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-[#F5EEEB]/30 border border-[#C8D9E6] text-[#2F4156] placeholder-[#2F4156]/40 text-sm focus:bg-white focus:border-[#567C8D] focus:ring-2 focus:ring-[#C8D9E6] transition-all outline-none font-medium"
               />
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-[#567C8D] absolute left-3.5 top-3" />
             </div>
           </div>
 
@@ -124,17 +132,17 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-[#D4AF37] via-[#F3CA52] to-[#D4AF37] text-[#07172F] text-sm font-bold uppercase tracking-wider hover:brightness-110 shadow-lg shadow-[#D4AF37]/20 transition-all cursor-pointer disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#2F4156] hover:bg-[#1E2B3A] text-white text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 active:scale-[0.99] border border-[#2F4156]"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
                   <span>Verifying Credentials...</span>
                 </>
               ) : (
                 <>
                   <span>Sign In to Dashboard</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </>
               )}
             </button>
@@ -142,18 +150,18 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Development Quick Credentials Helper */}
-        <div className="mt-6 pt-5 border-t border-slate-800 text-center">
-          <div className="p-3 rounded-lg bg-[#081830] border border-amber-600/30 text-[11px] text-amber-200/90 mb-3 text-left">
-            <p className="font-semibold text-[#D4AF37] mb-1">
+        <div className="mt-6 pt-5 border-t border-[#C8D9E6]/60 text-center">
+          <div className="p-3.5 rounded-xl bg-[#F5EEEB]/50 border border-[#C8D9E6] text-[11px] text-[#2F4156]/80 mb-3 text-left">
+            <p className="font-bold text-[#2F4156] mb-1">
               Local Development Preview:
             </p>
-            <p className="text-slate-300">
+            <p className="text-[#2F4156]/75">
               When live Supabase Auth credentials are not yet configured in <code>.env.local</code>, click below to autofill the pre-authorized development review account:
             </p>
             <button
               type="button"
               onClick={handleUseDevAdmin}
-              className="mt-2 text-[#D4AF37] underline font-mono text-[11px] hover:text-white cursor-pointer"
+              className="mt-2 text-[#567C8D] font-bold text-[11px] hover:text-[#2F4156] cursor-pointer"
             >
               Fill Dev Admin Credentials (admin@sircrrschool.ac.in)
             </button>
@@ -161,13 +169,13 @@ export default function AdminLoginPage() {
 
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs text-[#2F4156]/80 hover:text-[#2F4156] font-bold transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-3.5 h-3.5 text-[#567C8D]" />
             <span>Return to School Public Website</span>
           </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -12,13 +12,14 @@ export interface EmailResult {
 export async function sendAdmissionEnquiryNotification(
   enquiry: AdmissionEnquiry
 ): Promise<EmailResult> {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
   const toEmail = process.env.SCHOOL_ENQUIRY_NOTIFICATION_EMAIL || SCHOOL_INFO.contact.emailOfficial;
 
-  // In development without API key, simulate safely and report clearly
-  if (!apiKey) {
-    console.log(
-      `[DEV EMAIL SIMULATION] Admission enquiry received for student: ${enquiry.student_name}, Grade: ${enquiry.grade_applying}. Target recipient: ${toEmail}. Set RESEND_API_KEY in .env.local to send live emails.`
+  // In development without a live API key or with default placeholder, simulate safely and report clearly
+  const isPlaceholderKey = !apiKey || apiKey === "re_your_api_key_here" || apiKey.includes("your_api_key");
+  if (isPlaceholderKey) {
+    console.info(
+      `[DEV EMAIL SIMULATION] Admission enquiry recorded for ${enquiry.student_name} (${enquiry.grade_applying}). Intended recipient: ${toEmail}. Set a live RESEND_API_KEY in .env.local for production delivery.`
     );
     return {
       success: true,
@@ -29,7 +30,7 @@ export async function sendAdmissionEnquiryNotification(
 
   try {
     const resend = new Resend(apiKey);
-    const emailFrom = process.env.RESEND_FROM_EMAIL || "Sir C.R. Reddy Public School <onboarding@resend.dev>";
+    const emailFrom = process.env.RESEND_FROM_EMAIL || "Sir C. R. Reddy Public School <onboarding@resend.dev>";
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -37,24 +38,25 @@ export async function sendAdmissionEnquiryNotification(
         <head>
           <meta charset="utf-8">
           <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; padding: 24px; }
-            .card { background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
-            .header { background-color: #0c1e3c; color: #d4af37; padding: 20px 24px; }
-            .header h2 { margin: 0; font-size: 20px; font-weight: 700; }
-            .header p { margin: 4px 0 0 0; color: #cbd5e1; font-size: 13px; }
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFFFFF; color: #2F4156; padding: 24px; }
+            .card { background-color: #FFFFFF; max-width: 600px; margin: 0 auto; border-radius: 8px; border: 2px solid #C8D9E6; overflow: hidden; box-shadow: 0 4px 12px rgba(47,65,86,0.08); }
+            .header { background-color: #2F4156; color: #FFFFFF; padding: 20px 24px; border-bottom: 4px solid #567C8D; }
+            .header h2 { margin: 0; font-size: 20px; font-weight: 700; color: #FFFFFF; }
+            .header p { margin: 4px 0 0 0; color: #C8D9E6; font-size: 13px; font-weight: 500; }
             .body { padding: 24px; }
-            .field-row { margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
-            .field-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 600; }
-            .field-val { font-size: 15px; color: #0f172a; font-weight: 500; margin-top: 3px; }
-            .message-box { background: #f8fafc; border-left: 4px solid #d4af37; padding: 12px 16px; border-radius: 4px; font-style: italic; }
-            .footer { background-color: #f1f5f9; padding: 14px 24px; font-size: 12px; color: #64748b; text-align: center; }
+            .field-row { margin-bottom: 14px; border-bottom: 1px solid #C8D9E6; padding-bottom: 10px; }
+            .field-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #567C8D; font-weight: 700; }
+            .field-val { font-size: 15px; color: #2F4156; font-weight: 600; margin-top: 3px; }
+            .field-val a { color: #567C8D; text-decoration: none; font-weight: 700; }
+            .message-box { background: #F5EEEB; border-left: 4px solid #567C8D; padding: 12px 16px; border-radius: 4px; font-style: italic; color: #2F4156; }
+            .footer { background-color: #F5EEEB; border-top: 1px solid #C8D9E6; padding: 14px 24px; font-size: 12px; color: #2F4156; text-align: center; }
           </style>
         </head>
         <body>
           <div class="card">
             <div class="header">
               <h2>Sir C. R. Reddy Public School</h2>
-              <p>New Admission Enquiry Notification • Session ${enquiry.academic_year}</p>
+              <p>New Admission Enquiry Notification | Session ${enquiry.academic_year}</p>
             </div>
             <div class="body">
               <div class="field-row">
@@ -87,7 +89,7 @@ export async function sendAdmissionEnquiryNotification(
               ` : ""}
             </div>
             <div class="footer">
-              Enquiry ID: ${enquiry.id} • Received on ${new Date(enquiry.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST<br/>
+              Enquiry ID: ${enquiry.id} | Received on ${new Date(enquiry.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST<br/>
               Log in to the Admin Portal to update the candidate status.
             </div>
           </div>

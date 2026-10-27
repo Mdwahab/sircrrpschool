@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Users,
   Search,
   Phone,
   Mail,
-  Calendar,
   Loader2,
-  FileCheck,
+  AlertCircle,
+  RefreshCw,
+  X,
+  Shield,
+  Send,
 } from "lucide-react";
 import { AdmissionEnquiry, EnquiryStatus } from "@/lib/db/types";
 
@@ -20,23 +23,53 @@ export default function AdminEnquiriesPage() {
   const [selectedEnquiry, setSelectedEnquiry] = useState<AdmissionEnquiry | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [staffNote, setStaffNote] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const res = await fetch("/api/admin/enquiries", { signal: controller.signal });
+      clearTimeout(timeout);
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `HTTP ${res.status}: Failed to load enquiries`);
+      }
+
+      setEnquiries(Array.isArray(data.enquiries) ? data.enquiries : []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load enquiries.";
+      setErrorMsg(message);
+    } finally {
+      clearTimeout(timeout);
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     let ignore = false;
-    async function loadData() {
+    const fetchEnquiries = async () => {
       try {
         const res = await fetch("/api/admin/enquiries");
         const data = await res.json();
         if (!ignore && data.success) {
-          setEnquiries(data.enquiries);
+          setEnquiries(Array.isArray(data.enquiries) ? data.enquiries : []);
         }
-      } catch {
-        // Error handling
+      } catch (err: unknown) {
+        if (!ignore) {
+          const message = err instanceof Error ? err.message : "Failed to load enquiries.";
+          setErrorMsg(message);
+        }
       } finally {
         if (!ignore) setLoading(false);
       }
-    }
-    loadData();
+    };
+    fetchEnquiries();
     return () => {
       ignore = true;
     };
@@ -55,7 +88,7 @@ export default function AdminEnquiriesPage() {
         body: JSON.stringify({
           id: enquiryId,
           status: newStatus,
-          notes: note,
+          notes: note !== undefined ? note : selectedEnquiry?.notes,
         }),
       });
 
@@ -67,12 +100,20 @@ export default function AdminEnquiriesPage() {
         if (selectedEnquiry && selectedEnquiry.id === enquiryId) {
           setSelectedEnquiry(data.enquiry);
         }
+      } else {
+        alert(data.error || "Failed to update enquiry status.");
       }
     } catch {
       alert("Failed to update enquiry status.");
     } finally {
       setUpdatingStatus(false);
     }
+  };
+
+  const handleSaveNote = async () => {
+    if (!selectedEnquiry) return;
+    await handleUpdateStatus(selectedEnquiry.id, selectedEnquiry.status, staffNote);
+    setStaffNote("");
   };
 
   const filteredEnquiries = enquiries.filter((e) => {
@@ -92,163 +133,219 @@ export default function AdminEnquiriesPage() {
     switch (status) {
       case "new":
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40">
-            ★ New Enquiry
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFFFFF] text-[#567C8D] border border-[#567C8D]">
+            New Enquiry
           </span>
         );
       case "contacted":
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-950/80 text-blue-300 border border-blue-500/40">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]">
             Contacted
           </span>
         );
       case "enrolled":
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFFFFF] text-[#2F4156] border-2 border-[#567C8D]">
             Enrolled
           </span>
         );
       case "closed":
         return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]">
             Closed
           </span>
         );
     }
   };
 
+  const countByStatus = (status: string) => {
+    if (status === "all") return enquiries.length;
+    return enquiries.filter((e) => e.status === status).length;
+  };
+
   return (
     <div className="space-y-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#C8D9E6] pb-5">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-white flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-[#D4AF37]" />
+          <h1 className="text-2xl font-serif font-bold text-[#2F4156] flex items-center gap-2.5">
+            <Users className="w-6 h-6 text-[#567C8D]" />
             <span>Admission Enquiries Registry</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-[#2F4156] mt-1 font-semibold">
             Manage inbound parent admission queries, update contact statuses, and log administrative follow-ups.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium bg-emerald-950/50 px-3 py-1.5 rounded-lg border border-emerald-600/30">
-          <FileCheck className="w-4 h-4" />
-          <span>Restricted Authorized View</span>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-bold hover:bg-[#FFFFFF] hover:border-[#567C8D] transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            title="Refresh enquiries"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-[#567C8D] ${loading ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+
+          <div className="flex items-center gap-2 text-xs text-[#2F4156] font-bold bg-[#FFFFFF] px-3 py-2 rounded-xl border-2 border-[#C8D9E6]">
+            <Shield className="w-4 h-4 text-[#567C8D]" />
+            <span>Restricted Authorized View</span>
+          </div>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
+      {/* Search & Filters */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        {/* Search */}
+        <div className="relative flex-1 max-w-md">
           <input
             type="text"
-            placeholder="Search by student, parent, or phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs placeholder-slate-500 focus:border-[#D4AF37]"
+            placeholder="Search by student, parent, phone, or grade..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] placeholder-[#000000]/50 text-xs focus:border-[#567C8D] focus:ring-2 focus:ring-[#567C8D]/20 transition-all shadow-xs outline-none font-medium"
           />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-[#567C8D] absolute left-3 top-3" />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-400">Filter Status:</span>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37]"
-          >
-            <option value="all">All Enquiries ({enquiries.length})</option>
-            <option value="new">New ({enquiries.filter((e) => e.status === "new").length})</option>
-            <option value="contacted">Contacted ({enquiries.filter((e) => e.status === "contacted").length})</option>
-            <option value="enrolled">Enrolled ({enquiries.filter((e) => e.status === "enrolled").length})</option>
-            <option value="closed">Closed ({enquiries.filter((e) => e.status === "closed").length})</option>
-          </select>
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {[
+            { id: "all", label: "All" },
+            { id: "new", label: "New" },
+            { id: "contacted", label: "Contacted" },
+            { id: "enrolled", label: "Enrolled" },
+            { id: "closed", label: "Closed" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setStatusFilter(tab.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                statusFilter === tab.id
+                  ? "bg-[#567C8D] text-[#2F4156] shadow-xs"
+                  : "bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border-2 border-[#C8D9E6]"
+              }`}
+            >
+              {tab.label} ({countByStatus(tab.id)})
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Actionable Error State with Retry */}
+      {errorMsg && !loading && (
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border-2 border-[#567C8D] text-[#2F4156] text-xs flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-[#567C8D] flex-shrink-0" />
+            <span className="font-bold">{errorMsg}</span>
+          </div>
+          <button
+            type="button"
+            onClick={loadData}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] font-bold text-xs cursor-pointer transition-colors border border-[#2F4156]"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry</span>
+          </button>
+        </div>
+      )}
+
+      {/* Loading State */}
       {loading ? (
-        <div className="py-16 text-center text-slate-400 text-sm flex items-center justify-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-[#D4AF37]" />
-          <span>Loading admission enquiries...</span>
+        <div className="py-20 text-center text-[#2F4156] text-sm flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-[#567C8D]" />
+          <span className="font-semibold">Loading admission enquiries registry...</span>
         </div>
       ) : filteredEnquiries.length === 0 ? (
-        <div className="glass-card rounded-xl p-10 text-center border border-slate-800 text-slate-400">
-          No enquiries matching current search or status filters.
+        /* Empty State */
+        <div className="bg-[#FFFFFF] rounded-2xl p-12 text-center border-2 border-[#C8D9E6] shadow-xs space-y-3">
+          <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border border-[#C8D9E6] mx-auto flex items-center justify-center text-[#567C8D]">
+            <Users className="w-6 h-6" />
+          </div>
+          <h3 className="text-[#2F4156] font-serif font-bold text-base">No enquiries found</h3>
+          <p className="text-[#2F4156] text-xs max-w-md mx-auto">
+            {searchQuery
+              ? `No enquiries matched your search for "${searchQuery}".`
+              : statusFilter !== "all"
+              ? `No enquiries found with status "${statusFilter}".`
+              : "No admission enquiries have been registered yet."}
+          </p>
         </div>
       ) : (
-        <div className="glass-card rounded-xl border border-slate-800 overflow-hidden shadow-xl">
+        /* Enquiries Table */
+        <div className="bg-[#FFFFFF] rounded-2xl border-2 border-[#C8D9E6] overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-[#040C18] text-[#D4AF37] uppercase tracking-wider text-[11px] border-b border-slate-800">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-[#FFFFFF] border-b-2 border-[#C8D9E6] text-[#2F4156] uppercase tracking-wider font-bold">
                 <tr>
-                  <th className="py-3.5 px-4 font-bold">Candidate &amp; Parent</th>
-                  <th className="py-3.5 px-4 font-bold">Class of Interest</th>
-                  <th className="py-3.5 px-4 font-bold">Contact Details</th>
-                  <th className="py-3.5 px-4 font-bold">Submission Date</th>
-                  <th className="py-3.5 px-4 font-bold">Status</th>
-                  <th className="py-3.5 px-4 font-bold text-right">Action</th>
+                  <th className="px-5 py-3.5">Candidate &amp; Parent</th>
+                  <th className="px-5 py-3.5">Class / Grade</th>
+                  <th className="px-5 py-3.5">Contact Details</th>
+                  <th className="px-5 py-3.5">Date Received</th>
+                  <th className="px-5 py-3.5">Status</th>
+                  <th className="px-5 py-3.5 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {filteredEnquiries.map((e) => (
-                  <tr key={e.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-4 px-4 align-top">
-                      <strong className="text-white block font-semibold text-sm">
-                        {e.student_name}
-                      </strong>
-                      <span className="text-slate-400 text-xs">
-                        Parent: {e.parent_name}
-                      </span>
-                    </td>
-
-                    <td className="py-4 px-4 align-top max-w-xs">
-                      <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#0E2548] text-[#D4AF37] border border-[#D4AF37]/30 block w-max">
-                        {e.grade_applying}
-                      </span>
-                      <span className="text-[11px] text-slate-400 mt-1 block">
-                        Session: {e.academic_year}
-                      </span>
-                    </td>
-
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      <a
-                        href={`tel:${e.phone}`}
-                        className="flex items-center gap-1.5 text-[#D4AF37] hover:underline font-semibold"
-                      >
-                        <Phone className="w-3.5 h-3.5" />
-                        <span>{e.phone}</span>
-                      </a>
-                      {e.email && (
-                        <a
-                          href={`mailto:${e.email}`}
-                          className="flex items-center gap-1.5 text-slate-400 hover:text-white mt-1 text-[11px]"
-                        >
-                          <Mail className="w-3.5 h-3.5" />
-                          <span>{e.email}</span>
-                        </a>
-                      )}
-                    </td>
-
-                    <td className="py-4 px-4 align-top whitespace-nowrap text-slate-400">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{new Date(e.created_at).toLocaleDateString("en-IN")}</span>
+              <tbody className="divide-y divide-[#C8D9E6]">
+                {filteredEnquiries.map((enq) => (
+                  <tr
+                    key={enq.id}
+                    onClick={() => {
+                      setSelectedEnquiry(enq);
+                      setStaffNote(enq.notes || "");
+                    }}
+                    className="hover:bg-[#FFFFFF] transition-colors cursor-pointer"
+                  >
+                    <td className="px-5 py-4">
+                      <div className="font-bold text-[#2F4156] text-sm">{enq.student_name}</div>
+                      <div className="text-[#2F4156] text-[11px] mt-0.5">
+                        Parent: <span className="text-[#2F4156] font-bold">{enq.parent_name}</span>
                       </div>
                     </td>
 
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      {getStatusBadge(e.status)}
+                    <td className="px-5 py-4">
+                      <span className="font-bold text-[#2F4156]">{enq.grade_applying}</span>
+                      <div className="text-[10px] text-[#2F4156] font-mono">Session {enq.academic_year}</div>
                     </td>
 
-                    <td className="py-4 px-4 align-top text-right whitespace-nowrap">
+                    <td className="px-5 py-4 space-y-0.5">
+                      <div className="flex items-center gap-1.5 text-[#2F4156] font-mono font-bold">
+                        <Phone className="w-3 h-3 text-[#567C8D]" />
+                        <span>{enq.phone}</span>
+                      </div>
+                      {enq.email && (
+                        <div className="flex items-center gap-1.5 text-[#2F4156] text-[11px]">
+                          <Mail className="w-3 h-3 text-[#2F4156]" />
+                          <span>{enq.email}</span>
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="px-5 py-4 text-[#2F4156] text-[11px] whitespace-nowrap font-medium">
+                      {new Date(enq.created_at).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+
+                    <td className="px-5 py-4">
+                      {getStatusBadge(enq.status)}
+                    </td>
+
+                    <td className="px-5 py-4 text-right">
                       <button
                         type="button"
-                        onClick={() => {
-                          setSelectedEnquiry(e);
-                          setStaffNote(e.notes || "");
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedEnquiry(enq);
+                          setStaffNote(enq.notes || "");
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#0E2548] hover:bg-[#143566] text-[#D4AF37] border border-[#D4AF37]/30 text-xs font-semibold transition-colors cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6] hover:border-[#567C8D] font-bold text-[11px] cursor-pointer shadow-xs"
                       >
-                        Details &amp; Notes
+                        View &amp; Manage
                       </button>
                     </td>
                   </tr>
@@ -259,119 +356,132 @@ export default function AdminEnquiriesPage() {
         </div>
       )}
 
-      {/* Enquiry Details & Status Update Modal */}
+      {/* Detail / Status Management Modal */}
       {selectedEnquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-[#07172F] border border-[#D4AF37]/40 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative my-8 space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2F4156]/70 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] border-2 border-[#C8D9E6] rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl relative my-8 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between border-b-2 border-[#C8D9E6] pb-4 mb-5">
               <div>
-                <h3 className="text-lg font-serif font-bold text-white">
-                  Enquiry Dossier: {selectedEnquiry.student_name}
+                <span className="text-[10px] uppercase font-mono text-[#567C8D] font-bold tracking-wider block">
+                  Enquiry Ref: {selectedEnquiry.id}
+                </span>
+                <h3 className="text-xl font-serif font-bold text-[#2F4156] mt-1">
+                  {selectedEnquiry.student_name}
                 </h3>
-                <span className="text-xs text-slate-400">
-                  Ref ID: <strong className="font-mono text-white">{selectedEnquiry.id}</strong>
-                </span>
+                <p className="text-xs text-[#2F4156]">
+                  Application for <strong className="text-[#2F4156]">{selectedEnquiry.grade_applying}</strong> | Session {selectedEnquiry.academic_year}
+                </p>
               </div>
-              <div>{getStatusBadge(selectedEnquiry.status)}</div>
-            </div>
 
-            {/* Candidate Summary */}
-            <div className="grid grid-cols-2 gap-3 text-xs bg-[#081830] p-4 rounded-xl border border-slate-800">
-              <div>
-                <span className="text-slate-400 block">Candidate Name:</span>
-                <strong className="text-white text-sm">{selectedEnquiry.student_name}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 block">Grade of Interest:</span>
-                <strong className="text-[#D4AF37] text-sm">{selectedEnquiry.grade_applying}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 block">Parent / Guardian:</span>
-                <strong className="text-white">{selectedEnquiry.parent_name}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 block">Phone Number:</span>
-                <a href={`tel:${selectedEnquiry.phone}`} className="text-[#D4AF37] font-semibold">
-                  {selectedEnquiry.phone}
-                </a>
-              </div>
-              {selectedEnquiry.email && (
-                <div className="col-span-2">
-                  <span className="text-slate-400 block">Email:</span>
-                  <span className="text-slate-200">{selectedEnquiry.email}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Parent Message */}
-            {selectedEnquiry.message ? (
-              <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-1">
-                  Parent Message / Notes:
-                </span>
-                <div className="p-3 rounded-lg bg-[#081830] border border-slate-700/80 text-xs text-slate-200 leading-relaxed italic">
-                  &ldquo;{selectedEnquiry.message}&rdquo;
-                </div>
-              </div>
-            ) : (
-              <p className="text-xs text-slate-500 italic">No specific parent note entered.</p>
-            )}
-
-            {/* Status Change Selector */}
-            <div className="pt-2 border-t border-slate-800">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Update Candidate Status:
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {(["new", "contacted", "enrolled", "closed"] as EnquiryStatus[]).map((st) => (
-                  <button
-                    key={st}
-                    type="button"
-                    disabled={updatingStatus}
-                    onClick={() => handleUpdateStatus(selectedEnquiry.id, st, staffNote)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize cursor-pointer transition-all ${
-                      selectedEnquiry.status === st
-                        ? "bg-[#D4AF37] text-[#07172F] font-bold shadow-sm"
-                        : "bg-[#081830] text-slate-300 hover:bg-[#0E2548] border border-slate-700"
-                    }`}
-                  >
-                    {st}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Staff Internal Follow-up Notes */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Internal Staff Notes:
-              </label>
-              <textarea
-                rows={2}
-                value={staffNote}
-                onChange={(e) => setStaffNote(e.target.value)}
-                placeholder="Log contact outcome, dispatched prospectus, fee consultation notes..."
-                className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37]"
-              />
-              <button
-                type="button"
-                disabled={updatingStatus}
-                onClick={() =>
-                  handleUpdateStatus(selectedEnquiry.id, selectedEnquiry.status, staffNote)
-                }
-                className="mt-2 px-3 py-1.5 rounded-lg bg-[#0E2548] hover:bg-[#143566] text-[#D4AF37] border border-[#D4AF37]/30 text-xs font-semibold cursor-pointer"
-              >
-                {updatingStatus ? "Saving Note..." : "Save Note"}
-              </button>
-            </div>
-
-            <div className="pt-3 border-t border-slate-800 flex justify-end">
               <button
                 type="button"
                 onClick={() => setSelectedEnquiry(null)}
-                className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 cursor-pointer"
+                className="p-1.5 rounded-lg text-[#2F4156] hover:text-[#2F4156] hover:bg-[#FFFFFF] transition-colors cursor-pointer"
               >
-                Close Dossier
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {/* Contact Card */}
+              <div className="p-4 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] space-y-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <span className="text-[#2F4156] text-[11px]">Parent / Guardian:</span>
+                    <p className="text-[#2F4156] font-bold mt-0.5">{selectedEnquiry.parent_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-[#2F4156] text-[11px]">Contact Mobile:</span>
+                    <p className="text-[#2F4156] font-mono font-bold mt-0.5 flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-[#567C8D]" />
+                      <a href={`tel:${selectedEnquiry.phone}`} className="hover:underline">
+                        {selectedEnquiry.phone}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+
+                {selectedEnquiry.email && (
+                  <div className="pt-2 border-t border-[#C8D9E6]">
+                    <span className="text-[#2F4156] text-[11px]">Parent Email:</span>
+                    <p className="text-[#2F4156] mt-0.5">
+                      <a href={`mailto:${selectedEnquiry.email}`} className="text-[#2F4156] hover:underline font-bold">
+                        {selectedEnquiry.email}
+                      </a>
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Parent Message */}
+              {selectedEnquiry.message && (
+                <div className="p-3.5 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6]">
+                  <span className="text-[#2F4156] text-[11px] font-bold block mb-1">Parent Message / Note:</span>
+                  <p className="text-[#2F4156] italic leading-relaxed">{selectedEnquiry.message}</p>
+                </div>
+              )}
+
+              {/* Status Selector */}
+              <div>
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-2">
+                  Update Candidate Status
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {(["new", "contacted", "enrolled", "closed"] as EnquiryStatus[]).map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      disabled={updatingStatus}
+                      onClick={() => handleUpdateStatus(selectedEnquiry.id, status)}
+                      className={`px-3 py-2 rounded-xl font-bold text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                        selectedEnquiry.status === status
+                          ? "bg-[#567C8D] text-[#2F4156] shadow-xs border border-[#2F4156]"
+                          : "bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border border-[#C8D9E6]"
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Staff Internal Notes */}
+              <div>
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
+                  Internal Administrative Follow-up Notes
+                </label>
+                <textarea
+                  rows={3}
+                  value={staffNote}
+                  onChange={(e) => setStaffNote(e.target.value)}
+                  placeholder="Record call outcome, interaction schedule, or document verification status..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:border-[#567C8D] focus:ring-2 focus:ring-[#567C8D]/20 outline-none font-medium"
+                />
+                <div className="flex justify-end mt-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveNote}
+                    disabled={updatingStatus}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#567C8D] text-[#2F4156] hover:bg-[#1E2B3A] font-bold text-xs cursor-pointer disabled:opacity-50 shadow-xs border border-[#2F4156]"
+                  >
+                    {updatingStatus ? (
+                      <Loader2 className="w-3 h-3 animate-spin text-[#2F4156]" />
+                    ) : (
+                      <Send className="w-3 h-3 text-[#2F4156]" />
+                    )}
+                    <span>Save Note</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t-2 border-[#C8D9E6] flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedEnquiry(null)}
+                className="px-5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] hover:bg-[#FFFFFF] text-xs font-bold cursor-pointer"
+              >
+                Close
               </button>
             </div>
           </div>

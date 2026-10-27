@@ -11,27 +11,27 @@
   <!-- Library Bookshelf & Open Book Symbol -->
   <g transform="translate(400, 230)">
     <!-- Shelf line -->
-    <rect x="-130" y="55" width="260" height="10" rx="3" fill="#D4AF37" />
+    <rect x="-130" y="55" width="260" height="10" rx="3" fill="#2563EB" />
     <!-- Book row -->
     <rect x="-120" y="-35" width="22" height="90" rx="2" fill="#3B82F6" />
     <rect x="-95" y="-55" width="26" height="110" rx="2" fill="#E2E8F0" />
-    <rect x="-65" y="-25" width="20" height="80" rx="2" fill="#D4AF37" />
-    <rect x="-42" y="-45" width="24" height="100" rx="2" fill="#0284C7" />
+    <rect x="-65" y="-25" width="20" height="80" rx="2" fill="#1D4ED8" />
+    <rect x="-42" y="-45" width="24" height="100" rx="2" fill="#60A5FA" />
     
     <!-- Open Book in Center -->
     <path d="M 0,20 C -25,10 -65,10 -90,24 L -90,-20 C -65,-34 -25,-34 0,-24 C 25,-34 65,-34 90,-20 L 90,24 C 65,10 25,10 0,20 Z"
-          fill="#FFFFFF" stroke="#D4AF37" stroke-width="3" />
-    <path d="M 0,-24 L 0,20" stroke="#D4AF37" stroke-width="3" />
+          fill="#FFFFFF" stroke="#2563EB" stroke-width="3" />
+    <path d="M 0,-24 L 0,20" stroke="#2563EB" stroke-width="3" />
     
     <!-- Right side books -->
     <rect x="25" y="-35" width="22" height="90" rx="2" fill="#10B981" />
-    <rect x="50" y="-50" width="25" height="105" rx="2" fill="#F59E0B" />
+    <rect x="50" y="-50" width="25" height="105" rx="2" fill="#2563EB" />
     <rect x="78" y="-30" width="20" height="85" rx="2" fill="#6366F1" />
     <rect x="101" y="-40" width="22" height="95" rx="2" fill="#E2E8F0" />
   </g>
 
   <!-- Disclosure Label -->
-  <rect x="60" y="490" width="680" height="64" rx="8" fill="#051020" fill-opacity="0.95" stroke="#D4AF37" stroke-width="1.5" />
+  <rect x="60" y="490" width="680" height="64" rx="8" fill="#051020" fill-opacity="0.95" stroke="#2563EB" stroke-width="1.5" />
   <text x="400" y="518" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
     CENTRAL LIBRARY &amp; DIGITAL RESOURCE CENTER
   </text>

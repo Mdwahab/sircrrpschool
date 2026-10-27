@@ -33,7 +33,7 @@ export interface Achievement {
   title: string;
   category: "CBSE Board Examination" | "Olympiad & Academics" | "Sports & Athletics" | "Co-Curricular";
   description: string;
-  student_name?: string;
+  student_name?: string | null;
   document_url?: string | null;
   is_published: boolean;
   is_verified_record: boolean;

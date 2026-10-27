@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Bell,
   Plus,
@@ -11,15 +11,28 @@ import {
   Calendar,
   Loader2,
   AlertCircle,
+  RefreshCw,
+  Edit2,
 } from "lucide-react";
 import { Notice } from "@/lib/db/types";
+import { AdminFileUpload } from "@/components/ui/AdminFileUpload";
+
+const CATEGORIES: Notice["category"][] = [
+  "Academic",
+  "Examination",
+  "Circular",
+  "Event",
+  "General",
+];
 
 export default function AdminNoticesPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Notice | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>("All");
 
   // Form state
   const [form, setForm] = useState({
@@ -32,42 +45,100 @@ export default function AdminNoticesPage() {
     is_published: true,
   });
 
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setErrorMsg(null);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const res = await fetch("/api/admin/notices", { signal: controller.signal });
+      clearTimeout(timeout);
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `HTTP ${res.status}: Failed to load circulars`);
+      }
+
+      setNotices(Array.isArray(data.notices) ? data.notices : []);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to load notices.";
+      setErrorMsg(message);
+    } finally {
+      clearTimeout(timeout);
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let ignore = false;
-    async function loadData() {
+    const fetchNotices = async () => {
       try {
         const res = await fetch("/api/admin/notices");
         const data = await res.json();
         if (!ignore && data.success) {
-          setNotices(data.notices);
+          setNotices(Array.isArray(data.notices) ? data.notices : []);
         }
-      } catch {
-        if (!ignore) setErrorMsg("Failed to load circulars.");
+      } catch (err: unknown) {
+        if (!ignore) {
+          const message = err instanceof Error ? err.message : "Failed to load notices.";
+          setErrorMsg(message);
+        }
       } finally {
         if (!ignore) setLoading(false);
       }
-    }
-    loadData();
+    };
+    fetchNotices();
     return () => {
       ignore = true;
     };
   }, []);
 
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setForm({
+      title: "",
+      category: "Academic",
+      summary: "",
+      content: "",
+      attachment_name: "",
+      attachment_url: "",
+      is_published: true,
+    });
+    setModalOpen(true);
+  };
+
+  const handleOpenEdit = (notice: Notice) => {
+    setEditingItem(notice);
+    setForm({
+      title: notice.title,
+      category: notice.category,
+      summary: notice.summary,
+      content: notice.content || "",
+      attachment_name: notice.attachment_name || "",
+      attachment_url: notice.attachment_url || "",
+      is_published: notice.is_published,
+    });
+    setModalOpen(true);
+  };
+
   const handleTogglePublish = async (notice: Notice) => {
     try {
       const res = await fetch("/api/admin/notices", {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...notice,
-          is_published: !notice.is_published,
-        }),
+        body: JSON.stringify({ id: notice.id, is_published: !notice.is_published }),
       });
       const data = await res.json();
       if (data.success) {
         setNotices((prev) =>
-          prev.map((n) => (n.id === notice.id ? data.notice : n))
+          prev.map((n) =>
+            n.id === notice.id ? { ...n, is_published: !n.is_published } : n
+          )
         );
+      } else {
+        alert(data.error || "Failed to update publication status.");
       }
     } catch {
       alert("Failed to update status.");
@@ -75,9 +146,8 @@ export default function AdminNoticesPage() {
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`Are you sure you want to delete notice: "${title}"?`)) {
-      return;
-    }
+    if (!window.confirm(`Are you sure you want to delete notice: "${title}"?`)) return;
+
     try {
       const res = await fetch(`/api/admin/notices?id=${id}`, {
         method: "DELETE",
@@ -85,6 +155,8 @@ export default function AdminNoticesPage() {
       const data = await res.json();
       if (data.success) {
         setNotices((prev) => prev.filter((n) => n.id !== id));
+      } else {
+        alert(data.error || "Failed to delete notice.");
       }
     } catch {
       alert("Failed to delete notice.");
@@ -99,19 +171,11 @@ export default function AdminNoticesPage() {
     setErrorMsg(null);
 
     try {
+      const payload = editingItem ? { ...form, id: editingItem.id } : form;
       const res = await fetch("/api/admin/notices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: form.title,
-          category: form.category,
-          summary: form.summary,
-          content: form.content,
-          attachment_name: form.attachment_name || null,
-          attachment_url: form.attachment_url || null,
-          is_published: form.is_published,
-          publish_date: new Date().toISOString().split("T")[0],
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -120,175 +184,235 @@ export default function AdminNoticesPage() {
         return;
       }
 
-      setNotices((prev) => [data.notice, ...prev]);
+      if (editingItem) {
+        setNotices((prev) =>
+          prev.map((n) => (n.id === editingItem.id ? data.notice : n))
+        );
+      } else {
+        setNotices((prev) => [data.notice, ...prev]);
+      }
+
       setModalOpen(false);
-      setForm({
-        title: "",
-        category: "Academic",
-        summary: "",
-        content: "",
-        attachment_name: "",
-        attachment_url: "",
-        is_published: true,
-      });
+      setEditingItem(null);
     } catch {
-      setErrorMsg("Network error occurred.");
+      setErrorMsg("Network error during submission.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const filteredNotices = notices.filter((n) =>
+    activeCategory === "All" ? true : n.category === activeCategory
+  );
+
   return (
     <div className="space-y-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#C8D9E6] pb-5">
         <div>
-          <h1 className="text-2xl font-serif font-bold text-white flex items-center gap-2.5">
-            <Bell className="w-6 h-6 text-[#D4AF37]" />
-            <span>Notices &amp; Circulars Management</span>
+          <h1 className="text-2xl font-serif font-bold text-[#2F4156] flex items-center gap-2.5">
+            <Bell className="w-6 h-6 text-[#567C8D]" />
+            <span>Notices &amp; Official Circulars</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Publish official announcements, CBSE examination circulars, and downloadable documents.
+          <p className="text-xs text-[#2F4156] mt-1 font-semibold">
+            Publish academic schedules, examination circulars, and administrative institutional notices.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#D4AF37] text-[#07172F] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all shadow-md cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Circular</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs font-bold hover:bg-[#FFFFFF] hover:border-[#567C8D] transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            title="Refresh circulars"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 text-[#567C8D] ${loading ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] text-xs font-bold uppercase tracking-wider transition-all shadow-xs cursor-pointer border border-[#2F4156]"
+          >
+            <Plus className="w-4 h-4 text-[#2F4156]" />
+            <span>Create Notice</span>
+          </button>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="py-16 text-center text-slate-400 text-sm flex items-center justify-center gap-2">
-          <Loader2 className="w-5 h-5 animate-spin text-[#D4AF37]" />
-          <span>Loading circulars database...</span>
-        </div>
-      ) : notices.length === 0 ? (
-        <div className="glass-card rounded-xl p-10 text-center border border-slate-800 text-slate-400">
-          No circular records found. Click &quot;New Circular&quot; to author one.
-        </div>
-      ) : (
-        <div className="glass-card rounded-xl border border-slate-800 overflow-hidden shadow-xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-[#040C18] text-[#D4AF37] uppercase tracking-wider text-[11px] border-b border-slate-800">
-                <tr>
-                  <th className="py-3.5 px-4 font-bold">Category</th>
-                  <th className="py-3.5 px-4 font-bold">Notice Title &amp; Summary</th>
-                  <th className="py-3.5 px-4 font-bold">Date</th>
-                  <th className="py-3.5 px-4 font-bold">Status</th>
-                  <th className="py-3.5 px-4 font-bold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {notices.map((n) => (
-                  <tr key={n.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#0E2548] text-[#D4AF37] border border-[#D4AF37]/30">
-                        {n.category}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 align-top max-w-md">
-                      <strong className="text-white block font-semibold text-sm mb-0.5">
-                        {n.title}
-                      </strong>
-                      <p className="text-slate-400 text-xs line-clamp-2">
-                        {n.summary}
-                      </p>
-                      {n.attachment_name && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-[#D4AF37] mt-1.5">
-                          <FileText className="w-3 h-3" />
-                          <span>{n.attachment_name}</span>
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 align-top whitespace-nowrap text-slate-400">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{n.publish_date}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 align-top whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => handleTogglePublish(n)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                          n.is_published
-                            ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-900"
-                            : "bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700"
-                        }`}
-                        title="Click to toggle publish status"
-                      >
-                        {n.is_published ? (
-                          <>
-                            <CheckCircle className="w-3 h-3 text-emerald-400" />
-                            <span>Published</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-3 h-3 text-slate-400" />
-                            <span>Draft</span>
-                          </>
-                        )}
-                      </button>
-                    </td>
-                    <td className="py-4 px-4 align-top text-right whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(n.id, n.title)}
-                        className="p-1.5 rounded text-slate-400 hover:text-red-400 hover:bg-red-950/40 transition-colors cursor-pointer"
-                        title="Delete Notice"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Category Filter Tabs */}
+      <div className="flex flex-wrap items-center gap-2 pb-2">
+        {["All", ...CATEGORIES].map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setActiveCategory(cat)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeCategory === cat
+                ? "bg-[#567C8D] text-[#2F4156] shadow-xs"
+                : "bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border-2 border-[#C8D9E6]"
+            }`}
+          >
+            {cat} {cat === "All" ? `(${notices.length})` : `(${notices.filter((n) => n.category === cat).length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Actionable Error State with Retry */}
+      {errorMsg && !loading && (
+        <div className="p-4 rounded-xl bg-[#FFFFFF] border-2 border-[#567C8D] text-[#2F4156] text-xs flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-[#567C8D] flex-shrink-0" />
+            <span className="font-bold">{errorMsg}</span>
           </div>
+          <button
+            type="button"
+            onClick={loadData}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] font-bold text-xs cursor-pointer transition-colors border border-[#2F4156]"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry</span>
+          </button>
         </div>
       )}
 
-      {/* Author New Notice Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-[#07172F] border border-[#D4AF37]/40 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative my-8">
-            <h3 className="text-xl font-serif font-bold text-white mb-1">
-              Author School Notice / Circular
-            </h3>
-            <p className="text-xs text-slate-400 mb-5">
-              Enter circular metadata. Published circulars are visible immediately on the public website.
-            </p>
+      {/* Loading State */}
+      {loading ? (
+        <div className="py-20 text-center text-[#2F4156] text-sm flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-6 h-6 animate-spin text-[#567C8D]" />
+          <span className="font-semibold">Loading official circulars and notices...</span>
+        </div>
+      ) : filteredNotices.length === 0 ? (
+        /* Empty State */
+        <div className="bg-[#FFFFFF] rounded-2xl p-12 text-center border-2 border-[#C8D9E6] space-y-3 shadow-xs">
+          <div className="w-12 h-12 rounded-full bg-[#FFFFFF] border border-[#C8D9E6] mx-auto flex items-center justify-center text-[#567C8D]">
+            <Bell className="w-6 h-6" />
+          </div>
+          <h3 className="text-[#2F4156] font-serif font-bold text-base">No notices found</h3>
+          <p className="text-[#2F4156] text-xs max-w-md mx-auto">
+            {activeCategory === "All"
+              ? "No notices or circulars are currently registered. Click \"Create Notice\" to draft a new circular."
+              : `No notices found in category "${activeCategory}".`}
+          </p>
+          <button
+            type="button"
+            onClick={handleOpenCreate}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] text-xs font-bold uppercase tracking-wider cursor-pointer shadow-xs border border-[#2F4156]"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Create Notice</span>
+          </button>
+        </div>
+      ) : (
+        /* Notices List */
+        <div className="space-y-4">
+          {filteredNotices.map((notice) => (
+            <div
+              key={notice.id}
+              className="bg-[#FFFFFF] rounded-2xl p-5 border-2 border-[#C8D9E6] hover:border-[#567C8D] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs min-w-0 overflow-hidden"
+            >
+              <div className="space-y-1.5 max-w-3xl min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]">
+                    {notice.category}
+                  </span>
+                  <span className="text-xs text-[#2F4156] flex items-center gap-1 font-mono font-bold">
+                    <Calendar className="w-3 h-3 text-[#567C8D]" />
+                    <span>{notice.publish_date}</span>
+                  </span>
+                </div>
 
-            {errorMsg && (
-              <div className="mb-4 p-3 rounded-lg bg-red-950/80 border border-red-500/40 text-red-200 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-400" />
-                <span>{errorMsg}</span>
+                <h3 className="text-base font-bold text-[#2F4156] font-serif leading-snug break-words [overflow-wrap:anywhere]">
+                  {notice.title}
+                </h3>
+                <p className="text-xs text-[#2F4156] leading-relaxed break-words [overflow-wrap:anywhere]">
+                  {notice.summary}
+                </p>
+
+                {notice.attachment_name && (
+                  <div className="pt-1 flex items-center gap-1.5 text-[11px] text-[#2F4156] min-w-0 font-bold">
+                    <FileText className="w-3.5 h-3.5 text-[#567C8D] flex-shrink-0" />
+                    <span className="underline break-words [overflow-wrap:anywhere] min-w-0">{notice.attachment_name}</span>
+                  </div>
+                )}
               </div>
-            )}
+
+              <div className="flex items-center gap-2.5 self-end sm:self-center border-t sm:border-t-0 border-[#C8D9E6] pt-3 sm:pt-0 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleTogglePublish(notice)}
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all ${
+                    notice.is_published
+                      ? "bg-[#FFFFFF] text-[#2F4156] border-2 border-[#567C8D]"
+                      : "bg-[#FFFFFF] text-[#2F4156] border border-[#C8D9E6]"
+                  }`}
+                >
+                  {notice.is_published ? (
+                    <>
+                      <CheckCircle className="w-3 h-3 text-[#567C8D]" />
+                      <span>Published</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-3 h-3 text-[#2F4156]" />
+                      <span>Draft</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenEdit(notice)}
+                  className="p-2 rounded-xl bg-[#FFFFFF] text-[#2F4156] hover:bg-[#FFFFFF] border border-[#C8D9E6] transition-colors cursor-pointer"
+                  title="Edit notice"
+                >
+                  <Edit2 className="w-4 h-4 text-[#2F4156]" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleDelete(notice.id, notice.title)}
+                  className="p-2 rounded-xl bg-[#FFFFFF] text-[#567C8D] hover:bg-[#567C8D] hover:text-[#2F4156] border border-[#C8D9E6] transition-colors cursor-pointer"
+                  title="Delete notice"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add / Edit Notice Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2F4156]/70 backdrop-blur-xs p-4 overflow-y-auto">
+          <div className="bg-[#FFFFFF] border-2 border-[#C8D9E6] rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative my-8 animate-in fade-in zoom-in-95 duration-150">
+            <h3 className="text-xl font-serif font-bold text-[#2F4156] mb-1">
+              {editingItem ? "Edit Circular / Notice" : "Create Official School Notice"}
+            </h3>
+            <p className="text-xs text-[#2F4156] mb-5">
+              Draft and publish circulars, academic notices, and CBSE exam schedules to the website.
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Circular Title <span className="text-[#D4AF37]">*</span>
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Title / Subject <span className="text-[#567C8D]">*</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  placeholder="e.g. CBSE Class X Examination Registration 2025"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]"
+                  placeholder="e.g. CBSE Senior Secondary Pre-Board Schedule 2025"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] focus:ring-2 focus:ring-[#567C8D]/20 outline-none font-medium"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
                     Category
                   </label>
                   <select
@@ -299,29 +423,29 @@ export default function AdminNoticesPage() {
                         category: e.target.value as Notice["category"],
                       })
                     }
-                    className="w-full px-3 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37]"
+                    className="w-full px-3 py-2.5 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-semibold"
                   >
-                    <option value="Academic">Academic</option>
-                    <option value="Examination">Examination</option>
-                    <option value="Circular">Circular</option>
-                    <option value="Event">Event</option>
-                    <option value="General">General</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
                     Publish Status
                   </label>
                   <div className="pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-200">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-[#2F4156] font-semibold">
                       <input
                         type="checkbox"
                         checked={form.is_published}
                         onChange={(e) =>
                           setForm({ ...form, is_published: e.target.checked })
                         }
-                        className="rounded text-[#D4AF37] focus:ring-[#D4AF37]"
+                        className="rounded text-[#567C8D] focus:ring-[#567C8D]"
                       />
                       <span>Publish Immediately</span>
                     </label>
@@ -330,66 +454,93 @@ export default function AdminNoticesPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Brief Summary <span className="text-[#D4AF37]">*</span>
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Brief Summary <span className="text-[#567C8D]">*</span>
                 </label>
                 <textarea
                   rows={2}
                   required
                   value={form.summary}
                   onChange={(e) => setForm({ ...form, summary: e.target.value })}
-                  placeholder="Concise overview displayed on the public notice board..."
-                  className="w-full px-3 py-2.5 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs focus:border-[#D4AF37]"
+                  placeholder="Short 1-2 sentence overview shown in the circulars feed..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Attachment Name (PDF/Doc)
+                <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                  Full Details / Content (Optional)
                 </label>
-                <input
-                  type="text"
-                  value={form.attachment_name}
-                  onChange={(e) =>
-                    setForm({ ...form, attachment_name: e.target.value })
-                  }
-                  placeholder="e.g. CBSE_Exam_Circular_2025.pdf"
-                  className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs"
+                <textarea
+                  rows={3}
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  placeholder="Extended body text with specific instructions, dates, or guidelines..."
+                  className="w-full px-3.5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-medium"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Attachment URL or Supabase Storage Link
-                </label>
-                <input
-                  type="text"
+              <div className="space-y-3 pt-2 border-t border-[#C8D9E6]">
+                <AdminFileUpload
+                  label="Official Circular / Attachment File"
+                  helperText="Choose PDF, Word document, Excel, or image from your local file manager (Max 15 MB)"
+                  bucket="documents"
                   value={form.attachment_url}
-                  onChange={(e) =>
-                    setForm({ ...form, attachment_url: e.target.value })
+                  fileName={form.attachment_name}
+                  onChange={(url, originalName) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      attachment_url: url,
+                      attachment_name: prev.attachment_name.trim()
+                        ? prev.attachment_name
+                        : (originalName || ""),
+                    }))
                   }
-                  placeholder="https://... or #"
-                  className="w-full px-3 py-2 rounded-lg bg-[#081830] border border-slate-700 text-white text-xs font-mono"
+                  onFileNameChange={(name) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      attachment_name: prev.attachment_name.trim()
+                        ? prev.attachment_name
+                        : name,
+                    }))
+                  }
                 />
+
+                {form.attachment_url && (
+                  <div>
+                    <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1">
+                      Display Attachment Title (Shown to Parents)
+                    </label>
+                    <input
+                      type="text"
+                      value={form.attachment_name}
+                      onChange={(e) =>
+                        setForm({ ...form, attachment_name: e.target.value })
+                      }
+                      placeholder="e.g. CBSE Examination Schedule 2025.pdf"
+                      className="w-full px-3.5 py-2 rounded-xl bg-[#FFFFFF] border-2 border-[#C8D9E6] text-[#2F4156] text-xs focus:bg-[#FFFFFF] focus:border-[#567C8D] outline-none font-medium"
+                    />
+                  </div>
+                )}
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-800">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t-2 border-[#C8D9E6]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700 cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[#C8D9E6] text-[#2F4156] text-xs font-bold hover:bg-[#F5EEEB] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#D4AF37] text-[#07172F] text-xs font-bold uppercase tracking-wider hover:brightness-110 cursor-pointer disabled:opacity-50"
+                  disabled={submitting || !form.title.trim()}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#2F4156] hover:bg-[#1E2B3A] text-white text-xs font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50 shadow-sm transition-all"
                 >
                   {submitting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                   ) : (
-                    <span>Save Circular</span>
+                    <span>{editingItem ? "Update Notice" : "Save Notice"}</span>
                   )}
                 </button>
               </div>

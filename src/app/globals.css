@@ -2,92 +2,165 @@
 
 @layer base {
   :root {
-    --navy-950: #040c18;
-    --navy-900: #07172f;
-    --navy-850: #0a1e3c;
-    --navy-800: #0f284e;
-    --navy-700: #16396e;
-    --gold-500: #d4af37;
-    --gold-400: #f2cb57;
-    --gold-600: #aa7c11;
+    /* OFFICIAL CINEMATIC PALETTE: NAVY, TEAL, SKY BLUE, BEIGE, WHITE */
+    --color-navy: #2F4156;       /* Primary identity, navigation, deep headings, footer */
+    --color-teal: #567C8D;       /* Secondary actions, active states, accents */
+    --color-sky: #C8D9E6;        /* Subtle highlights, borders, decorative badges */
+    --color-beige: #F5EEEB;      /* Warm editorial sections, heritage, content canvas */
+    --color-white: #FFFFFF;      /* Clean reading surfaces, cards, forms */
+
+    /* Semantic mappings */
+    --site-background: #FFFFFF;
+    --site-surface: #FFFFFF;
+    --site-text: #2F4156;
+    --site-muted: #567C8D;
+    --site-border: #C8D9E6;
   }
 
   html {
     scroll-behavior: smooth;
-    color-scheme: light dark;
+    color-scheme: light;
+    background-color: #FFFFFF;
   }
 
   body {
-    background-color: #051020;
-    color: #f8fafc;
+    background-color: #FFFFFF;
+    color: #2F4156;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Accessible focus indicators */
+  /* Universal text selection in the refined Teal palette */
+  ::selection {
+    background-color: #567C8D;
+    color: #FFFFFF;
+  }
+
+  /* Accessible focus indicators with Teal outline */
   *:focus-visible {
-    outline: 2px solid #d4af37;
+    outline: 2px solid #567C8D;
     outline-offset: 3px;
   }
 }
 
-/* Glassmorphism Navigation & Cards */
-.glass-nav {
-  background: rgba(7, 23, 47, 0.88);
+/* Cinematic Utilities & Micro-interactions */
+.glass-panel-navy {
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+  border: 1px solid rgba(200, 217, 230, 0.8);
 }
 
-.glass-card {
-  background: rgba(10, 30, 60, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(212, 175, 55, 0.18);
+.glass-panel-dark {
+  background: rgba(47, 65, 86, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(200, 217, 230, 0.25);
 }
 
-.glass-card-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(212, 175, 55, 0.45);
-  box-shadow: 0 16px 36px -12px rgba(212, 175, 55, 0.15), 0 0 20px rgba(10, 30, 60, 0.4);
-}
-
-/* Gold Gradient Text */
-.gold-text-gradient {
-  background: linear-gradient(135deg, #fceba4 0%, #d4af37 50%, #aa7c11 100%);
+/* Two-tone gradient text highlights using Navy to Teal */
+.gradient-text-navy-teal {
+  background: linear-gradient(135deg, #2F4156 0%, #3B536E 50%, #567C8D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Reduced Motion Compliance */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto !important;
-  }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+.gradient-text-teal {
+  background: linear-gradient(135deg, #567C8D 0%, #3B5B6B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
+/* Cinematic Card Lift & Sky Blue Borders */
+.card-cinema {
+  background: #FFFFFF;
+  border: 1px solid #C8D9E6;
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(47, 65, 86, 0.05), 0 2px 6px -1px rgba(47, 65, 86, 0.02);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-::-webkit-scrollbar-track {
-  background: #040c18;
+
+.card-cinema:hover {
+  transform: translateY(-4px);
+  border-color: #567C8D;
+  box-shadow: 0 20px 35px -5px rgba(47, 65, 86, 0.12), 0 8px 16px -3px rgba(86, 124, 141, 0.08);
 }
-::-webkit-scrollbar-thumb {
-  background: #16396e;
-  border-radius: 5px;
-  border: 2px solid #040c18;
+
+/* Primary Button — Cinematic Navy */
+.btn-cinema-navy {
+  background: #2F4156;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  box-shadow: 0 4px 14px -2px rgba(47, 65, 86, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+
+.btn-cinema-navy:hover {
+  background: #1E2B3A;
+  box-shadow: 0 8px 24px -4px rgba(47, 65, 86, 0.45);
+  transform: translateY(-2px);
+}
+
+.btn-cinema-navy:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button — Cinematic Teal */
+.btn-cinema-teal {
+  background: #567C8D;
+  color: #FFFFFF;
+  font-weight: 700;
+  border-radius: 0.875rem;
+  box-shadow: 0 4px 14px -2px rgba(86, 124, 141, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-cinema-teal:hover {
+  background: #446473;
+  box-shadow: 0 8px 22px -4px rgba(86, 124, 141, 0.45);
+  transform: translateY(-2px);
+}
+
+/* Outline Button — Crisp White with Navy Border */
+.btn-cinema-outline {
+  background: #FFFFFF;
+  color: #2F4156;
+  font-weight: 700;
+  border: 2px solid #C8D9E6;
+  border-radius: 0.875rem;
+  box-shadow: 0 2px 8px -1px rgba(47, 65, 86, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-cinema-outline:hover {
+  border-color: #567C8D;
+  color: #2F4156;
+  background: #F5EEEB;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px -2px rgba(86, 124, 141, 0.15);
+}
+
+/* Shimmer Animation in Sky Blue tones */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(200, 217, 230, 0.4), transparent);
+  animation: shimmer 3s infinite ease-in-out;
 }

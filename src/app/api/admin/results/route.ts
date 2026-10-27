@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth/session";
 import { getAllAchievementsAdmin, saveAchievement, deleteAchievement } from "@/lib/db/service";
 
@@ -23,6 +24,13 @@ export async function POST(req: NextRequest) {
   }
 
   const saved = await saveAchievement(body);
+  try {
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/results");
+  } catch (err) {
+    console.warn("[REVALIDATE ERROR]", err);
+  }
   return NextResponse.json({ success: true, achievement: saved });
 }
 
@@ -39,5 +47,12 @@ export async function DELETE(req: NextRequest) {
   }
 
   await deleteAchievement(id);
+  try {
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/results");
+  } catch (err) {
+    console.warn("[REVALIDATE ERROR]", err);
+  }
   return NextResponse.json({ success: true });
 }

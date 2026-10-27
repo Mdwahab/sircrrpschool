@@ -1,129 +1,197 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ShieldCheck, Target, Compass, Award } from "lucide-react";
+import {
+  ShieldCheck,
+  Target,
+  Compass,
+  Award,
+  Calendar,
+} from "lucide-react";
+import {
+  ScrollStaggerContainer,
+  ScrollStaggerItem,
+  CinematicMaskReveal,
+} from "@/components/ui/ScrollAnimation";
 
+const HISTORICAL_MILESTONES = [
+  {
+    year: "1945",
+    title: "Governing Committee Founded",
+    desc: "Sir C. R. Reddy Educational Institutions founded in Eluru under visionary educational leadership.",
+  },
+  {
+    year: "1984",
+    title: "Public School Established",
+    desc: "Inaugurated to impart disciplined, English-medium CBSE schooling to children of West Godavari.",
+  },
+  {
+    year: "CBSE 130072",
+    title: "Senior Secondary Affiliation",
+    desc: "Affiliated with CBSE New Delhi, preparing students up to Class XII in Science & Commerce streams.",
+  },
+  {
+    year: "40+ Years",
+    title: "Institutional Legacy",
+    desc: "Four decades of dedicated service, state achievements, and thousands of accomplished alumni.",
+  },
+];
+
+const CORE_PILLARS = [
+  {
+    icon: Target,
+    title: "Academic Rigor",
+    desc: "Inquiry-based CBSE curriculum blending conceptual depth with continuous diagnostic evaluations.",
+    badge: "Excellence",
+  },
+  {
+    icon: Compass,
+    title: "Moral Grounding",
+    desc: "Value-integrated education cultivating discipline, civic responsibility, and ethical courage.",
+    badge: "Character",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Comprehensive Learning",
+    desc: "Instruction spanning physical sports, expressive arts, and hands-on laboratory discovery.",
+    badge: "Growth",
+  },
+  {
+    icon: Award,
+    title: "Proven Distinction",
+    desc: "Dedicated faculty mentorship guiding students toward higher university and competitive success.",
+    badge: "Heritage",
+  },
+];
 
 export function AboutSection() {
   return (
-    <section id="about" className="py-24 bg-[#051020] relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-[#0A1E3C]/40 rounded-full blur-[120px] pointer-events-none" />
-
+    <section id="about" className="py-20 sm:py-28 bg-[#F5EEEB] relative scroll-mt-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <SectionHeading
-          badge="OUR HERITAGE &amp; VISION"
+          badge="OUR HERITAGE &amp; ETHOS"
           title="Rooted in History, Dedicated to Excellence"
+          highlight="Excellence"
           subtitle="Four decades of academic distinction under the historic Sir C. R. Reddy Educational Institutions."
         />
 
-        {/* Founder Tribute & Historical Overview */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
-          {/* Portrait Column */}
-          <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-sm rounded-2xl overflow-hidden glass-card p-2 shadow-2xl border border-[#D4AF37]/30">
-              <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#0A1E3C]">
+        {/* 1. Milestones Grid: Staggered Bottom-to-Top Reveal */}
+        <ScrollStaggerContainer className="mb-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {HISTORICAL_MILESTONES.map((item, idx) => (
+            <ScrollStaggerItem key={idx}>
+              <div className="bg-white p-6 rounded-2xl border border-[#C8D9E6] hover:border-[#567C8D] transition-all duration-300 shadow-xs hover:shadow-lg hover:-translate-y-1.5 group">
+                <div className="flex items-center gap-2 mb-3">
+                  <Calendar className="w-4 h-4 text-[#567C8D]" />
+                  <span className="font-mono text-xs font-extrabold text-[#2F4156] uppercase tracking-wider bg-[#C8D9E6]/40 px-2.5 py-0.5 rounded-full border border-[#C8D9E6]">
+                    {item.year}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-[#2F4156] group-hover:text-[#567C8D] transition-colors font-serif mb-1.5 leading-snug">
+                  {item.title}
+                </h4>
+                <p className="text-xs sm:text-sm text-[#567C8D] leading-relaxed font-normal">
+                  {item.desc}
+                </p>
+              </div>
+            </ScrollStaggerItem>
+          ))}
+        </ScrollStaggerContainer>
+
+        {/* 2. Founder Tribute & Institutional Ethos Spread */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-16 p-6 sm:p-10 rounded-3xl border border-[#C8D9E6] bg-white shadow-sm">
+          {/* Founder Portrait Column: Film-like Mask Expansion Reveal */}
+          <CinematicMaskReveal className="lg:col-span-5 flex justify-center" delay={0.1}>
+            <div className="relative w-full max-w-sm rounded-2xl overflow-hidden bg-white p-4 shadow-md border-2 border-[#C8D9E6] group transition-all duration-300 hover:shadow-xl hover:border-[#567C8D] hover:-translate-y-1">
+              <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F5EEEB] border border-[#C8D9E6]/60">
                 <Image
                   src="/images/founder-portrait.svg"
                   alt="Dr. Sir Cattamanchi Ramalinga Reddy Tribute Portrait"
                   fill
-                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 384px"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </div>
-              <div className="p-3 text-center">
-                <span className="text-xs text-[#D4AF37] font-semibold tracking-wider uppercase block">
+              <div className="pt-4 pb-1 text-center">
+                <span className="text-xs text-[#567C8D] font-bold tracking-wider uppercase block">
                   Patron &amp; Namesake
                 </span>
-                <span className="text-xs text-slate-400">
-                  Dr. Sir Cattamanchi Ramalinga Reddy (1880–1951)
+                <h4 className="text-base font-serif font-bold text-[#2F4156] mt-0.5">
+                  Dr. Sir Cattamanchi Ramalinga Reddy
+                </h4>
+                <span className="text-xs text-[#567C8D] font-medium block mt-0.5">
+                  (1880–1951), Renowned Scholar &amp; Founding VC, Andhra University
                 </span>
               </div>
             </div>
-          </div>
+          </CinematicMaskReveal>
 
-          {/* Text Editorial Column */}
-          <div className="lg:col-span-7 space-y-5 text-slate-300 leading-relaxed text-base">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#0E2548] border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Sir C.R. Reddy Educational Institutions (Managing Committee Estd. 1945)</span>
-            </div>
+          {/* Institutional Ethos Description Column: Sequential Stagger */}
+          <ScrollStaggerContainer className="lg:col-span-7 space-y-5">
+            <ScrollStaggerItem>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F5EEEB] text-[#2F4156] border border-[#C8D9E6] text-xs font-bold uppercase tracking-wider shadow-2xs">
+                <span>Founding Ideals</span>
+              </div>
+            </ScrollStaggerItem>
 
-            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white leading-snug">
-              A Noble Educational Legacy in Eluru
-            </h3>
+            <ScrollStaggerItem>
+              <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#2F4156] leading-snug">
+                A Legacy of Values-Based{" "}
+                <span className="bg-gradient-to-r from-[#2F4156] via-[#3E5C6B] to-[#567C8D] bg-clip-text text-transparent font-extrabold">
+                  Education &amp; Service
+                </span>
+              </h3>
+            </ScrollStaggerItem>
 
-            <p>
-              Sir C. R. Reddy Public School was founded in <strong>1984</strong> in Eluru, Andhra Pradesh, under the aegis of the Sir C. R. Reddy Educational Institutions, whose pioneer managing committee was established in 1945. Named in honor of the eminent educationist, scholar, and founding Vice-Chancellor of Andhra University, <strong>Dr. Sir Cattamanchi Ramalinga Reddy</strong>, the institution upholds his timeless conviction that education must combine intellectual vigor with uncompromising ethical character.
-            </p>
-
-            <p>
-              Affiliated with the <strong>Central Board of Secondary Education (CBSE No. 130072)</strong>, New Delhi, up to the Senior Secondary level, the school offers a continuous educational pathway from the foundational pre-primary stage through Class XII, preparing scholars for national competitive examinations, higher university studies, and responsible citizenship.
-            </p>
-
-            <div className="p-4 rounded-xl bg-[#081830] border-l-4 border-[#D4AF37] text-sm text-amber-100">
-              <p className="font-serif italic">
-                &ldquo;True education illuminates not only the intellect with scientific truths, but molds the spirit to serve society with courage, truth, and humanity.&rdquo;
+            <ScrollStaggerItem>
+              <p className="text-sm sm:text-base text-[#567C8D] leading-relaxed font-normal">
+                Named after the illustrious educationist, philosopher, and statesman <strong className="text-[#2F4156] font-semibold">Dr. Sir C. R. Reddy</strong>, our school inherits a noble institutional ethos dating back to 1945. Under the stewardship of the Sir C. R. Reddy Educational Institutions, we provide children of West Godavari district with established educational instruction in Eluru.
               </p>
-            </div>
-          </div>
+            </ScrollStaggerItem>
+
+            <ScrollStaggerItem>
+              <p className="text-sm sm:text-base text-[#567C8D] leading-relaxed font-normal">
+                Our educators nurture intellectual curiosity, scientific reasoning, artistic expression, and unshakeable ethical integrity. Every child is guided to achieve their highest academic potential in a supportive, co-educational atmosphere.
+              </p>
+            </ScrollStaggerItem>
+
+            <ScrollStaggerItem>
+              <div className="border-l-4 border-[#567C8D] pl-5 py-3 bg-[#F5EEEB] rounded-r-2xl">
+                <p className="font-serif italic text-sm sm:text-base text-[#2F4156] font-medium leading-relaxed">
+                  &ldquo;True education illuminates the mind, strengthens character, and instills a lifelong dedication to the common welfare.&rdquo;
+                </p>
+              </div>
+            </ScrollStaggerItem>
+          </ScrollStaggerContainer>
         </div>
 
-        {/* Vision, Mission, and Core Philosophy Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1: Vision */}
-          <div className="glass-card p-6 sm:p-8 rounded-2xl border border-[#D4AF37]/20 flex flex-col justify-between hover:border-[#D4AF37]/45 transition-colors">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] mb-5 shadow-inner">
-                <Target className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-bold text-white mb-3 font-serif">
-                Our Vision
-              </h4>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                To be a premier center of holistic schooling that inspires students to achieve academic mastery, scientific inquiry, aesthetic sensibility, and patriotic integrity within an atmosphere of disciplined discovery.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-700/60 text-xs text-[#D4AF37] font-semibold">
-              Holistic Growth &amp; National Spirit
-            </div>
-          </div>
-
-          {/* Card 2: Mission */}
-          <div className="glass-card p-6 sm:p-8 rounded-2xl border border-[#D4AF37]/20 flex flex-col justify-between hover:border-[#D4AF37]/45 transition-colors">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] mb-5 shadow-inner">
-                <Compass className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-bold text-white mb-3 font-serif">
-                Our Mission
-              </h4>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                To deliver child-centric, experientially grounded CBSE curriculum education, fostering critical thinking, modern scientific skills, physical vigor, and empathetic character through committed mentorship.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-700/60 text-xs text-[#D4AF37] font-semibold">
-              Excellence Through Mentorship
-            </div>
-          </div>
-
-          {/* Card 3: Values */}
-          <div className="glass-card p-6 sm:p-8 rounded-2xl border border-[#D4AF37]/20 flex flex-col justify-between hover:border-[#D4AF37]/45 transition-colors">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[#0E2548] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] mb-5 shadow-inner">
-                <Award className="w-6 h-6" />
-              </div>
-              <h4 className="text-xl font-bold text-white mb-3 font-serif">
-                Core Philosophy
-              </h4>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Guided by the institution&apos;s foundational principle — <em>&ldquo;Quality Service &amp; Value Based Education&rdquo;</em> — we prioritize moral rectitude, communal harmony, environmental stewardship, and humility.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-700/60 text-xs text-[#D4AF37] font-semibold">
-              Value-Based Educational Foundation
-            </div>
-          </div>
-        </div>
+        {/* 3. Core Institutional Pillars: Staggered Bottom-to-Top Reveal */}
+        <ScrollStaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {CORE_PILLARS.map((pillar, idx) => {
+            const Icon = pillar.icon;
+            return (
+              <ScrollStaggerItem key={idx}>
+                <div className="bg-white p-6 rounded-2xl border border-[#C8D9E6] hover:border-[#567C8D] transition-all duration-300 shadow-xs hover:shadow-lg hover:-translate-y-1.5 group">
+                  <div className="w-12 h-12 rounded-xl bg-[#C8D9E6]/30 border border-[#C8D9E6] flex items-center justify-center text-[#2F4156] group-hover:bg-[#567C8D] group-hover:text-white mb-4 shadow-2xs group-hover:scale-105 transition-all">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-base font-bold text-[#2F4156] font-serif">
+                      {pillar.title}
+                    </h4>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#2F4156] bg-[#F5EEEB] px-2.5 py-0.5 rounded-full border border-[#C8D9E6]">
+                      {pillar.badge}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#567C8D] leading-relaxed font-normal">
+                    {pillar.desc}
+                  </p>
+                </div>
+              </ScrollStaggerItem>
+            );
+          })}
+        </ScrollStaggerContainer>
       </div>
     </section>
   );
