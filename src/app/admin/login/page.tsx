@@ -95,12 +95,15 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
+            <label htmlFor="admin-email" className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
               Administrator Email
             </label>
             <div className="relative">
               <input
+                id="admin-email"
+                name="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@sircrrschool.ac.in"
@@ -112,12 +115,15 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
+            <label htmlFor="admin-password" className="block text-xs font-bold text-[#2F4156] uppercase tracking-wider mb-1.5">
               Secure Password
             </label>
             <div className="relative">
               <input
+                id="admin-password"
+                name="password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"

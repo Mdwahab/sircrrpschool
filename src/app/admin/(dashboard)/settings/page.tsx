@@ -362,12 +362,12 @@ export default function AdminSettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#567C8D] hover:bg-[#1E2B3A] text-[#2F4156] text-xs font-bold uppercase tracking-wider shadow-xs hover:shadow-md cursor-pointer transition-all disabled:opacity-50 border border-[#2F4156]"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#2F4156] hover:bg-[#1E2B3A] text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md cursor-pointer transition-all disabled:opacity-50 border border-[#2F4156]"
             >
               {saving ? (
-                <Loader2 className="w-4 h-4 animate-spin text-[#2F4156]" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
               ) : (
-                <Save className="w-4 h-4 text-[#2F4156]" />
+                <Save className="w-4 h-4 text-white" />
               )}
               <span>{saving ? "Saving Settings..." : "Save Settings"}</span>
             </button>

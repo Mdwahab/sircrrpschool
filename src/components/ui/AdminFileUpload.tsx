@@ -184,6 +184,7 @@ export function AdminFileUpload({
             <button
               type="button"
               onClick={handleRemove}
+              aria-label="Remove Attachment"
               className="p-1.5 rounded-lg bg-white border border-[#C8D9E6] hover:border-[#567C8D] text-[#567C8D] hover:text-[#2F4156] transition-colors cursor-pointer shadow-2xs"
               title="Remove Attachment"
             >
@@ -244,11 +245,14 @@ export function AdminFileUpload({
       {/* Optional Manual URL Input Fallback */}
       {showManualInput && (
         <div className="pt-2 animate-in fade-in duration-150">
-          <label className="block text-[11px] font-bold text-[#567C8D] uppercase tracking-wider mb-1">
+          <label htmlFor="manual-attachment-url" className="block text-[11px] font-bold text-[#567C8D] uppercase tracking-wider mb-1">
             Manual Attachment Link / URL
           </label>
           <input
+            id="manual-attachment-url"
+            name="manual_attachment_url"
             type="text"
+            aria-label="Manual Attachment Link or URL"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder="e.g. /uploads/documents/circular.pdf or https://..."

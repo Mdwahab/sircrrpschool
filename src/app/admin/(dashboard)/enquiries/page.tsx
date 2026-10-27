@@ -201,6 +201,7 @@ export default function AdminEnquiriesPage() {
         <div className="relative flex-1 max-w-md">
           <input
             type="text"
+            aria-label="Search enquiries by student, parent, phone, or grade"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by student, parent, phone, or grade..."
