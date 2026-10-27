@@ -115,11 +115,6 @@ sircrreddy/
    npm run dev
    ```
    Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-4. To access the Admin Console:
-   - Navigate to [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
-   - Click **"Fill Dev Admin Credentials"** to autofill the pre-authorized review account (`admin@sircrreddy.ac.in`) or use your Supabase credentials.
-
 ---
 
 ## 5. VALIDATION & SECURITY CHECKS
